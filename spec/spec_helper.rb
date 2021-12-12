@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+require "byebug"
+require "strong_attributes"
+
+RSpec.configure do |config|
+  config.expect_with :rspec do |expectations|
+    # Disallow should syntax
+    expectations.syntax = :expect
+    expectations.max_formatted_output_length = 1000
+  end
+
+  config.define_derived_metadata do |metadata|
+    metadata[:type] = :feature
+  end
+end

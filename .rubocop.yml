@@ -1,0 +1,11 @@
+inherit_gem:
+  citizens-advice-style:
+    - default.yml
+
+require: rubocop-rspec
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 3
