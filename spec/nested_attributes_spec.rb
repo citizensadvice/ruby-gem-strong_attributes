@@ -70,18 +70,20 @@ RSpec.describe StrongAttributes do
       )
     end
 
-    it "replaces defaults" do
+    it "merges values into defaults" do
       test_class = Class.new do
         include StrongAttributes
 
         nested_attributes :object, default: { name: "foo" } do
           attribute :name, :string
+          attribute :number, :float
         end
       end
 
-      expect(test_class.new(object: { name: "bar" })).to have_attributes(
+      expect(test_class.new(object: { number: 1 })).to have_attributes(
         object: have_attributes(
-          name: "bar"
+          name: "foo",
+          number: 1.0
         )
       )
     end
@@ -149,7 +151,7 @@ RSpec.describe StrongAttributes do
     end
   end
 
-  describe "setting initial values" do
+  describe "overriding setters" do
     let(:test_class) do
       Class.new do
         include StrongAttributes
@@ -160,13 +162,12 @@ RSpec.describe StrongAttributes do
         end
 
         def object=(value)
-          super(name: "foo") unless @object
-          super value
+          super(value.merge("name" => "foo"))
         end
       end
     end
 
-    it "allows values to be set" do
+    it "allows setters to be overridden" do
       test = test_class.new(object: { number: 0.1 })
       expect(test).to have_attributes(
         object: have_attributes(
@@ -174,13 +175,78 @@ RSpec.describe StrongAttributes do
           number: 0.1
         )
       )
-      test.object = { name: "bar" }
-      expect(test).to have_attributes(
-        object: have_attributes(
-          name: "bar",
-          number: 0.1
-        )
-      )
+    end
+  end
+
+  describe "validation" do
+    it "validates the nested attributes" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        def self.name
+          "Form"
+        end
+
+        nested_attributes :object, default: {} do
+          attribute :name, :string
+          attribute :number, :float
+
+          validates :name, :number, presence: true
+        end
+      end
+
+      test = test_class.new
+      expect(test).to be_invalid
+      expect(test.errors.full_messages).to eq [
+        "Object name can't be blank",
+        "Object number can't be blank"
+      ]
+    end
+
+    context "when copy_errors if false" do 
+      it "does not validate the nested attributes" do
+        test_class = Class.new do
+          include StrongAttributes
+
+          def self.name
+            "Form"
+          end
+
+          nested_attributes :object, default: {}, copy_errors: false do
+            attribute :name, :string
+            attribute :number, :float
+
+            validates :name, :number, presence: true
+          end
+        end
+
+        test = test_class.new
+        expect(test).to be_valid
+      end
+    end
+
+    context "when using shoulda matches" do
+      subject do
+        Class.new do
+          include StrongAttributes
+
+          def self.name
+            "Class"
+          end
+
+          nested_attributes :object, default: {}, copy_errors: false do
+            attribute :name, :string
+            validates :name, presence: true
+          end
+        end.new.object
+      end
+
+      before do
+        # Pretty sure this is a bug in shoulda matches
+        stub_const("ActiveRecord::Type::Serialized", Class.new)
+      end
+
+      it { is_expected.to validate_presence_of :name }
     end
   end
 end

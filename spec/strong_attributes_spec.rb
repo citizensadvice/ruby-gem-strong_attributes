@@ -102,7 +102,7 @@ RSpec.describe StrongAttributes do
           attr_accessor :unsafe
         end
 
-        expect(test_class.new({ unsafe: "foo" }).unsafe).to eq nil
+        expect(test_class.new({ "unsafe" => "foo" }).unsafe).to eq nil
       end
     end
 
@@ -244,6 +244,10 @@ RSpec.describe StrongAttributes do
         test_class = Class.new do
           include StrongAttributes
           attribute :name, :string, default: :default_value
+
+          def default_value
+            "foo"
+          end
         end
 
         expect(test_class.new(name: "bar").name).to eq "bar"
@@ -510,9 +514,31 @@ RSpec.describe StrongAttributes do
       expect(test.invalid?).to eq true
       expect(test.errors.full_messages).to eq ["Number is not a number"]
     end
+
+    context "when using shoulda matches" do
+      subject do
+        Class.new do
+          include StrongAttributes
+
+          def self.name
+            "Class"
+          end
+
+          attribute :name, :string
+          validates :name, presence: true
+        end.new
+      end
+
+      before do
+        # Pretty sure this is a bug in shoulda matches
+        stub_const("ActiveRecord::Type::Serialized", Class.new)
+      end
+
+      it { is_expected.to validate_presence_of :name }
+    end
   end
 
-  describe "attribute presences" do
+  describe "attribute presence" do
     it "allows presence to be checked" do
       test_class = Class.new do
         include StrongAttributes
@@ -538,6 +564,44 @@ RSpec.describe StrongAttributes do
       end
 
       expect(test_class.new(number: 1).number).to eq 2
+    end
+  end
+
+  describe ".inspect" do
+    let(:test_class) do
+      Class.new do
+        include StrongAttributes
+
+        def self.name
+          "Test"
+        end
+
+        attribute :name, :string
+        attribute :number, :float
+      end
+    end
+
+    it "gives a pretty inspect" do
+      expect(test_class.inspect).to eq "Test(name: string, number: float)"
+    end
+  end
+
+  describe "#inspect" do
+    let(:test_class) do
+      Class.new do
+        include StrongAttributes
+
+        def self.name
+          "Test"
+        end
+
+        attribute :name, :string
+        attribute :number, :float
+      end
+    end
+
+    it "gives a pretty inspect" do
+      expect(test_class.new(name: "foo").inspect).to eq '#<Test name: "foo", number: nil>'
     end
   end
 end

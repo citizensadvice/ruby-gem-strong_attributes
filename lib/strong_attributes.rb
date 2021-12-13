@@ -3,6 +3,7 @@
 require "active_model"
 require "active_support"
 require "strong_attributes/version"
+require "strong_attributes/helpers"
 require "strong_attributes/nested_attributes"
 
 module StrongAttributes
@@ -25,6 +26,12 @@ module StrongAttributes
     def safe_setter(*names)
       self._safe_setters = [*_safe_setters, *names.map(&:to_s)]
     end
+
+    # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L395
+    def inspect
+      attr_list = attribute_types.map { |name, type| "#{name}: #{type.type || 'object'}" } * ", "
+      "#{name}(#{attr_list})"
+    end
   end
 
   included do
@@ -37,8 +44,9 @@ module StrongAttributes
     kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
     attributes = attributes.require(param_name).permit! if param_name
     attributes ||= kwargs
-    super _filter_attributes(attributes)
-    _set_defaults(attributes)
+    @attributes = _default_attributes.deep_dup
+    _set_defaults
+    assign_attributes(attributes) if attributes
   end
 
   def assign_attributes(attributes)
@@ -46,16 +54,29 @@ module StrongAttributes
   end
   alias attributes= assign_attributes
 
+  # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L669
+  def inspect
+    inspection = if defined?(@attributes) && @attributes
+                   self.class.attribute_names.collect do |name|
+                     "#{name}: #{send(name).inspect}"
+                   end.compact.join(", ")
+                 else
+                   "not initialized"
+                 end
+
+    "#<#{self.class.name} #{inspection}>"
+  end
+
   private
 
-  delegate :_attribute_default_procs, :_safe_setters, to: :class
+  delegate :_attribute_default_procs, :_safe_setters, :_default_attributes, to: :class, private: true
 
-  # Used by the numericality validator
+  # Used by the numericality validator to detect invalid numbers
   def attribute_before_type_cast(attr_name)
     @attributes[attr_name].value_before_type_cast
   end
 
-  # Used by the numericality validator
+  # Used by the numericality validator to detect invalid numbers
   def attribute_came_from_user?(attr_name)
     @attributes[attr_name].came_from_user?
   end
@@ -64,9 +85,9 @@ module StrongAttributes
     attributes[attr_name].present?
   end
 
-  def _set_defaults(attributes)
-    _attribute_default_procs.without(*attributes.keys.map(&:to_sym)).each do |name, value|
-      value = _default_value(name, value)
+  def _set_defaults
+    _attribute_default_procs.each do |name, value|
+      value = Helpers.default_value(name, value, self)
       if @attributes.key?(name.to_s)
         @attributes.write_from_database(name.to_s, value)
       else
@@ -80,13 +101,6 @@ module StrongAttributes
   end
 
   def safe_setters
-    self.class._default_attributes.keys + _safe_setters
-  end
-
-  def _default_value(name, value)
-    return value.arity.positive? ? instance_exec(name, &value) : instance_exec(&value) if value.is_a? Proc
-    return __send__(value) if value.is_a? Symbol
-
-    value
+    _default_attributes.keys + _safe_setters
   end
 end

@@ -17,6 +17,9 @@ GEM
   specs:
     activemodel (6.1.4.1)
       activesupport (= 6.1.4.1)
+    activerecord (6.1.4.1)
+      activemodel (= 6.1.4.1)
+      activesupport (= 6.1.4.1)
     activesupport (6.1.4.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
@@ -63,6 +66,8 @@ GEM
     rubocop-rspec (2.6.0)
       rubocop (~> 1.19)
     ruby-progressbar (1.11.0)
+    shoulda-matchers (5.0.0)
+      activesupport (>= 5.2.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
@@ -72,11 +77,13 @@ PLATFORMS
   x86_64-darwin-21
 
 DEPENDENCIES
+  activerecord
   byebug
   citizens-advice-style!
   rspec
   rubocop
   rubocop-rspec
+  shoulda-matchers
   strong_attributes!
 
 BUNDLED WITH

@@ -4,8 +4,14 @@ inherit_gem:
 
 require: rubocop-rspec
 
+AllCops:
+  TargetRubyVersion: 3
+
 RSpec/ExampleLength:
   Enabled: false
 
 RSpec/MultipleExpectations:
   Max: 3
+
+Metrics/MethodLength:
+  Max: 12

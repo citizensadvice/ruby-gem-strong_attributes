@@ -1,10 +1,14 @@
 # StrongAttributes
 
-Create a form object using [`ActiveModel::Attributes`](https://www.rubydoc.info/gems/activemodel/ActiveModel/Attributes).
+Create a [form object](https://dev.to/drbragg/rails-design-patterns-form-object-4d47)
+built from [`ActiveModel::Attributes`](https://www.rubydoc.info/gems/activemodel/ActiveModel/Attributes).
 
-Allows the form to be initialized with the user input, and only inputs matching the defined params will be used.
+The form can be initialized directly using params from a controller, and only the user data matching
+defined attributes will be set.
 
-This works a bit like [Vitus](https://github.com/solnic/virtus) but using ActiveModel 
+This gives you type coercion and skips needing to setup your StrongParameters filter, because it is built into the model.
+
+Nested models, arrays, and proc/method defaults are also supported.
 
 ```ruby
 # Define a form
@@ -12,7 +16,7 @@ class Form
   include StrongAttributes
 
   attribute :my_string, :string, default: "new default"
-  attribute :my_number, :integer, default: -> { 2 }
+  attribute :my_number, :integer, default: :some_method
 end
 
 # Define a controller
@@ -30,29 +34,46 @@ end
 # @form # => <Form my_string="foo" my_number=1>
 ```
 
-## Passing non-user input
+## Setting defaults
 
-Any kwargs passed to the form will call setters
+## Overriding setters
+
+## Initializing
+
+It is useful to initialize a model with non-user input.  For example you
+might want to pass in model loaded by the controller.
+
+If the form is initialized with an object, then any keyword arguments passed to the form
+will be passed to attributes writers.
 
 ```ruby
 class Form
   include StrongAttributes
 
   attr_accessor :not_set_by_user
+  attr_accessor :safe_from_user
 
-  attribute :my_string, :string, default: "new default"
-  attribute :my_number, :integer, default: -> { 2 }
+  attribute :my_string, :string
+  attribute :my_number, :integer
 end
 
-form = Form.new({ my_string: "foo" }, not_set_by_user: "something")
+form = Form.new({ my_string: "foo", safe_from_user: "bad_value" }, not_set_by_user: "something")
 form.not_set_by_user # => "something"
-
+form.safe_from_user # => nil
 ```
+
+## Validation
+
+## Custom attributes
+
+## Nested attributes
+
+## Safe setters
 
 # TODO
 
-- Add tests for none nested
-- Tests for numeracality validator
-- Try with shoulda matchers
-- Tests for nested
-- Add useful attribute definitions
+- Tests for nested array attributes
+- Fix linting
+  - move specs
+- Finish docs
+
