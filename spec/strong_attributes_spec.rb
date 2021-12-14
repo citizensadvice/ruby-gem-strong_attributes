@@ -83,6 +83,59 @@ RSpec.describe StrongAttributes do
     end
   end
 
+  describe "array attributes" do
+    context "when defined explicitly" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+          attribute :name, StrongAttributes::Type::Array.new(type: :string)
+        end
+      end
+
+      it "creates an attribute that converts items to an array" do
+        expect(test_class.new(name: "foo").name).to eq ["foo"]
+      end
+
+      it "creates an attribute that saves items as an array" do
+        expect(test_class.new(name: %w[foo bar]).name).to eq %w[foo bar]
+      end
+    end
+
+    context "when defined with :array" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+          attribute :name, :array, :string
+        end
+      end
+
+      it "creates an attribute that converts items to an array" do
+        expect(test_class.new(name: "foo").name).to eq ["foo"]
+      end
+
+      it "creates an attribute that saves items as an array" do
+        expect(test_class.new(name: %w[foo bar]).name).to eq %w[foo bar]
+      end
+    end
+
+    context "when defined with :array and explicit sub-type" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+          attribute :name, :array, ActiveModel::Type::String.new
+        end
+      end
+
+      it "creates an attribute that converts items to an array" do
+        expect(test_class.new(name: "foo").name).to eq ["foo"]
+      end
+
+      it "creates an attribute that saves items as an array" do
+        expect(test_class.new(name: %w[foo bar]).name).to eq %w[foo bar]
+      end
+    end
+  end
+
   describe "calling setters" do
     context "with just kwargs" do
       it "does not call setters" do

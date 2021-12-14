@@ -5,6 +5,7 @@ require "active_support"
 require "strong_attributes/version"
 require "strong_attributes/helpers"
 require "strong_attributes/nested_attributes"
+require "strong_attributes/type/array"
 
 module StrongAttributes
   extend ActiveSupport::Concern
@@ -16,11 +17,15 @@ module StrongAttributes
   include NestedAttributes
 
   class_methods do
-    def attribute(name, type = ActiveModel::Type::Value.new, **options)
+    def attribute(name, type = ActiveModel::Type::Value.new, subtype = nil, **options)
       if options[:default].is_a?(Proc) || options[:default].is_a?(Symbol)
         self._attribute_default_procs = _attribute_default_procs.merge(name => options.delete(:default))
       end
-      super
+      if type == :array
+        super(name, Type::Array.new(type: subtype), **options)
+      else
+        super(name, type, **options)
+      end
     end
 
     def safe_setter(*names)

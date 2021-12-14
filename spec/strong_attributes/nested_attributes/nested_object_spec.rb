@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe StrongAttributes do
+RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
   it "allows nested attributes with inline definitions" do
     test_class = Class.new do
       include StrongAttributes
@@ -12,6 +12,27 @@ RSpec.describe StrongAttributes do
 
     expect(test_class.new(object: { name: "foo" })).to have_attributes(
       object: have_attributes(
+        name: "foo"
+      )
+    )
+  end
+
+  it "allows nested attributes with a form definition" do
+    test_sub = Class.new do
+      include StrongAttributes
+
+      attribute :name, :string
+    end
+
+    test_class = Class.new do
+      include StrongAttributes
+
+      nested_attributes :object, test_sub
+    end
+
+    expect(test_class.new(object: { name: "foo" })).to have_attributes(
+      object: have_attributes(
+        class: test_sub,
         name: "foo"
       )
     )
@@ -203,7 +224,7 @@ RSpec.describe StrongAttributes do
       ]
     end
 
-    context "when copy_errors if false" do 
+    context "when copy_errors if false" do
       it "does not validate the nested attributes" do
         test_class = Class.new do
           include StrongAttributes
@@ -247,6 +268,116 @@ RSpec.describe StrongAttributes do
       end
 
       it { is_expected.to validate_presence_of :name }
+    end
+  end
+
+  describe "allow_destroy" do
+    let(:test_class) do
+      Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, allow_destroy: true do
+          attribute :name, :string
+        end
+      end
+    end
+
+    it "sets a value if _destroy is not true" do
+      expect(test_class.new(object: { name: "foo", _destroy: "f" })).to have_attributes(
+        object: have_attributes(
+          name: "foo"
+        )
+      )
+    end
+
+    it "removes the value is _destroy is true" do
+      test = test_class.new(object: { name: "foo" })
+      test.object = { _destroy: "t" }
+      expect(test.object).to eq nil
+    end
+  end
+
+  describe "reject_if" do
+    context "with a proc" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_attributes :object, reject_if: ->(attrs) { attrs["name"] == "foo" } do
+            attribute :name, :string
+          end
+        end
+      end
+
+      it "sets a value if proc returns falsey" do
+        expect(test_class.new(object: { name: "bar" })).to have_attributes(
+          object: have_attributes(
+            name: "bar"
+          )
+        )
+      end
+
+      it "does not set a value if proc returns truthy" do
+        expect(test_class.new(object: { name: "foo" })).to have_attributes(
+          object: nil
+        )
+      end
+    end
+
+    context "with a symbol" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_attributes :object, reject_if: :reject_if? do
+            attribute :name, :string
+          end
+
+          def reject_if?(attrs)
+            attrs["name"] == "foo"
+          end
+        end
+      end
+
+      it "sets a value if proc returns falsey" do
+        expect(test_class.new(object: { name: "bar" })).to have_attributes(
+          object: have_attributes(
+            name: "bar"
+          )
+        )
+      end
+
+      it "does not set a value if proc returns truthy" do
+        expect(test_class.new(object: { name: "foo" })).to have_attributes(
+          object: nil
+        )
+      end
+    end
+
+    context "with :all_blank" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_attributes :object, reject_if: :all_blank do
+            attribute :name, :string
+          end
+        end
+      end
+
+      it "sets a value if attributes" do
+        expect(test_class.new(object: { name: "bar" })).to have_attributes(
+          object: have_attributes(
+            name: "bar"
+          )
+        )
+      end
+
+      it "does not set a value if no attributes" do
+        expect(test_class.new(object: { name: "" })).to have_attributes(
+          object: nil
+        )
+      end
     end
   end
 end

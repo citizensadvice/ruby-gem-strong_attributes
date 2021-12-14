@@ -17,5 +17,22 @@ module StrongAttributes
 
       value
     end
+
+    def self.destroy_flag?(destroy)
+      ActiveModel::Type::Boolean.new.cast(destroy)
+    end
+
+    def self.reject?(attributes, value, context)
+      case value
+      when :all_blank
+        attributes.all? { |_, v| v.blank? }
+      when Symbol
+        context.__send__(value, attributes)
+      when Proc
+        context.instance_exec(attributes, &value)
+      else
+        value
+      end
+    end
   end
 end
