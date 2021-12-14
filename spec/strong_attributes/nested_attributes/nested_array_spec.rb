@@ -269,9 +269,6 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
     end
   end
 
-  describe "replacing all values" do
-  end
-
   describe "overriding setters" do
     let(:test_class) do
       Class.new do

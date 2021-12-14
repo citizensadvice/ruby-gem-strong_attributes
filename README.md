@@ -74,5 +74,5 @@ form.safe_from_user # => nil
 
 # TODO
 
-- Rename repo
-- Finish docs
+- Add doc comments
+- Finish readme

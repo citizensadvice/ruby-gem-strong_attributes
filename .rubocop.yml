@@ -14,4 +14,10 @@ RSpec/MultipleExpectations:
   Max: 3
 
 Metrics/MethodLength:
-  Max: 12
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
