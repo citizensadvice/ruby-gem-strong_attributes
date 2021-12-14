@@ -5,16 +5,23 @@ module StrongAttributes
     class NestedObject
       attr_reader :value
 
-      def initialize(form)
+      def initialize(form, allow_destroy: false, reject_if: nil)
         @form = form
+        @allow_destroy = allow_destroy
+        @reject_if = reject_if
       end
 
-      def value=(value)
+      def assign_value(value, context)
         case value
         when nil, @form
           @value = value
         when Hash
-          if @value
+          value = value.with_indifferent_access
+          return if @reject_if && Helpers.reject?(value, @reject_if, context)
+
+          if @allow_destroy && Helpers.destroy_flag?(value["_destroy"])
+            @value = nil
+          elsif @value
             # Already initialized, merge in known attributes
             @value.assign_attributes(value)
           else

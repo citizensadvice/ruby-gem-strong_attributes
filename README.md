@@ -68,12 +68,11 @@ form.safe_from_user # => nil
 
 ## Nested attributes
 
+### Clearing the values
+
 ## Safe setters
 
 # TODO
 
-- Tests for nested array attributes
-- Fix linting
-  - move specs
+- Rename repo
 - Finish docs
-
