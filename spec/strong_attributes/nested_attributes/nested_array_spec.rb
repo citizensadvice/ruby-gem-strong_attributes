@@ -42,6 +42,26 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
     )
   end
 
+  it "stores data on the instance" do
+    test_class = Class.new do
+      include StrongAttributes
+
+      nested_array_attributes :array do
+        attribute :name, :string
+      end
+    end
+
+    test_class.new(array: [name: "foo"])
+
+    expect(test_class.new(array: [name: "foo"])).to have_attributes(
+      array: match([
+        have_attributes(
+          name: "foo"
+        )
+      ])
+    )
+  end
+
   describe "default values" do
     it "sets fixed defaults" do
       test_class = Class.new do

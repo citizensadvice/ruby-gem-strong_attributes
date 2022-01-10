@@ -38,6 +38,24 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     )
   end
 
+  it "stores data on the instance" do
+    test_class = Class.new do
+      include StrongAttributes
+
+      nested_attributes :object do
+        attribute :name, :string
+      end
+    end
+
+    test_class.new(object: { name: "foo" })
+
+    expect(test_class.new(object: { name: "foo" })).to have_attributes(
+      object: have_attributes(
+        name: "foo"
+      )
+    )
+  end
+
   describe "default values" do
     it "sets fixed defaults" do
       test_class = Class.new do
