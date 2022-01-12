@@ -1,41 +1,47 @@
 GIT
   remote: https://github.com/citizensadvice/citizens-advice-style-ruby
-  revision: 9f87cc993a5e202119aaefa906770ae0472b4fc1
-  tag: v5.0.0
+  revision: c084221dc43f6db555d748c4c6a786bbed417027
+  tag: v6.0.0
   specs:
-    citizens-advice-style (5.0.0)
-      rubocop (~> 1.23.0)
-      rubocop-rspec (~> 2.6.0)
+    citizens-advice-style (6.0.0)
+      rubocop (~> 1.24.1)
+      rubocop-rspec (~> 2.7.0)
 
 PATH
   remote: .
   specs:
-    strong_attributes (0.0.3)
+    strong_attributes (0.0.4)
       activemodel (>= 6.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (6.1.4.1)
-      activesupport (= 6.1.4.1)
-    activesupport (6.1.4.1)
+    activemodel (7.0.1)
+      activesupport (= 7.0.1)
+    activesupport (7.0.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-      zeitwerk (~> 2.3)
     ast (2.4.2)
-    byebug (11.1.3)
     concurrent-ruby (1.1.9)
-    diff-lcs (1.4.4)
+    debug (1.4.0)
+      irb (>= 1.3.6)
+      reline (>= 0.2.7)
+    diff-lcs (1.5.0)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
-    minitest (5.14.4)
+    io-console (0.5.11)
+    irb (1.4.1)
+      reline (>= 0.3.0)
+    minitest (5.15.0)
     parallel (1.21.0)
-    parser (3.0.3.2)
+    parser (3.1.0.0)
       ast (~> 2.4.1)
-    rainbow (3.0.0)
+    rainbow (3.1.1)
     regexp_parser (2.2.0)
+    reline (0.3.1)
+      io-console (~> 0.5)
     rexml (3.2.5)
     rspec (3.10.0)
       rspec-core (~> 3.10.0)
@@ -50,37 +56,36 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.3)
-    rubocop (1.23.0)
+    rubocop (1.24.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.12.0, < 2.0)
+      rubocop-ast (>= 1.15.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.15.0)
+    rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
-    rubocop-rspec (2.6.0)
+    rubocop-rspec (2.7.0)
       rubocop (~> 1.19)
     ruby-progressbar (1.11.0)
-    shoulda-matchers (5.0.0)
+    shoulda-matchers (5.1.0)
       activesupport (>= 5.2.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
-    zeitwerk (2.5.1)
 
 PLATFORMS
   x86_64-darwin-20
   x86_64-darwin-21
 
 DEPENDENCIES
-  byebug
   citizens-advice-style!
+  debug
   rspec
   shoulda-matchers
   strong_attributes!
 
 BUNDLED WITH
-   2.2.32
+   2.3.3

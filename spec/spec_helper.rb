@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "byebug"
+require "debug"
 require "strong_attributes"
 require "shoulda-matchers"
 

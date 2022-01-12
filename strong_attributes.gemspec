@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "activemodel", ">= 6.1.0"
 
-  s.add_development_dependency "byebug"
+  s.add_development_dependency "debug"
   s.add_development_dependency "rspec"
   s.add_development_dependency "shoulda-matchers"
 end

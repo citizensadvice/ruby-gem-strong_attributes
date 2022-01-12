@@ -1,3 +1,5 @@
+**WARNING: experimental**
+
 # StrongAttributes
 
 Create a [form object](https://dev.to/drbragg/rails-design-patterns-form-object-4d47)

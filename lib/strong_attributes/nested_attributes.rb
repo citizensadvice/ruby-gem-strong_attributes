@@ -8,7 +8,7 @@ module StrongAttributes
   module NestedAttributes
     extend ActiveSupport::Concern
 
-    class_methods do
+    class_methods do # rubocop:disable Metrics/BlockLength
       def nested_attributes(name, form = nil, **options, &block)
         _define_nested_attributes(name, NestedObject, form, **options, &block)
       end
@@ -52,10 +52,9 @@ module StrongAttributes
 
     delegate :_nested_attribute, to: :class, private: true
 
-    private
-
     def nested_attributes_store
       @nested_attributes_store ||= {}
     end
+    private :nested_attributes_store
   end
 end
