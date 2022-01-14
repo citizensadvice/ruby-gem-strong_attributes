@@ -38,6 +38,49 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     )
   end
 
+  it "allows nested attributes with an inherited definition" do
+    test_parent = Class.new do
+      include StrongAttributes
+
+      nested_attributes :inherited_object do
+        attribute :name, :string
+      end
+      nested_attributes :object do
+        attribute :foo, :string
+      end
+    end
+
+    # Sibling class
+    Class.new(test_parent) do
+      nested_attributes :object do
+        attribute :value, :string
+      end
+    end
+
+    test_class = Class.new(test_parent) do
+      nested_attributes :object do
+        attribute :name, :string
+      end
+    end
+
+    # Check inheritance
+    test = test_class.new(object: { name: "foo", value: "bar" }, inherited_object: { name: "in" })
+    expect(test).to have_attributes(
+      object: have_attributes(
+        name: "foo"
+      ),
+      inherited_object: have_attributes(
+        name: "in"
+      )
+    )
+
+    # Check overriding parent
+    expect(test.object).not_to respond_to(:foo)
+
+    # Check not inheriting from sibling
+    expect(test.object).not_to respond_to(:value)
+  end
+
   it "stores data on the instance" do
     test_class = Class.new do
       include StrongAttributes

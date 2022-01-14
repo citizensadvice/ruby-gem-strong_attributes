@@ -22,7 +22,11 @@ module StrongAttributes
       def _nested_methods
         # A module to hold the setter methods
         # This will allow them to be overridden by the user and for the user to call super
-        @_nested_methods ||= Module.new
+        @_nested_methods ||= begin
+          m = Module.new
+          include m
+          m
+        end
       end
 
       def _define_nested_attributes(name, type, form = nil, default: nil, copy_errors: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
@@ -31,22 +35,23 @@ module StrongAttributes
         self._nested_attributes = _nested_attributes.merge(name => form)
         self._attribute_default_procs = _attribute_default_procs.merge(name => default) if default
         store = :"_nested_attribute_#{name}"
-        _nested_methods.define_method store do
-          nested_attributes_store[name] ||= type.new(form, **options)
-        end
-        private store
-        _nested_methods.define_method name do
-          send(store).value
-        end
-        _nested_methods.define_method "#{name}=" do |value|
-          send(store).assign_value(value, self)
+        _nested_methods.module_eval do
+          define_method store do
+            nested_attributes_store[name] ||= type.new(form, **options)
+          end
+          private store
+          define_method name do
+            send(store).value
+          end
+          define_method "#{name}=" do |value|
+            send(store).assign_value(value, self)
+          end
         end
         validates_with CopyErrorsValidator, allow_blank: true, attributes: [name] if copy_errors
       end
     end
 
     included do
-      include _nested_methods
       class_attribute :_nested_attributes, default: {}
     end
 
