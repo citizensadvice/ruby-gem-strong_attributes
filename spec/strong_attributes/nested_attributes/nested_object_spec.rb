@@ -38,6 +38,58 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     )
   end
 
+  it "allows nested attributes with a form definition as a string" do
+    test_sub = Class.new do
+      include StrongAttributes
+
+      attribute :name, :string
+    end
+
+    stub_const("MyClass", test_sub)
+
+    test_class = Class.new do
+      include StrongAttributes
+
+      nested_attributes :object, "MyClass"
+    end
+
+    expect(test_class.new(object: { name: "foo" })).to have_attributes(
+      object: have_attributes(
+        class: test_sub,
+        name: "foo"
+      )
+    )
+  end
+
+  it "allows inline definitions with a specified base class" do
+    base_class = Class.new do
+      include StrongAttributes
+
+      def foo
+        "bar"
+      end
+    end
+
+    stub_const("MyClass", base_class)
+
+    test_class = Class.new do
+      include StrongAttributes
+
+      nested_attributes :object, "MyClass" do
+        attribute :name, :string
+      end
+    end
+
+    test = test_class.new(object: { name: "foo" })
+    expect(test).to have_attributes(
+      object: have_attributes(
+        name: "foo",
+        foo: "bar"
+      )
+    )
+    expect(test.object).to be_a(MyClass)
+  end
+
   it "allows nested attributes with an inherited definition" do
     test_parent = Class.new do
       include StrongAttributes

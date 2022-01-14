@@ -2,9 +2,9 @@
 
 module StrongAttributes
   module Helpers
-    def self.create_anonymous_form(name, parent_name, &block)
-      form = Class.new
-      form.include StrongAttributes
+    def self.create_anonymous_form(name, parent_name, base_class, &block)
+      form = Class.new(base_class || Object)
+      form.include StrongAttributes unless base_class&.include?(StrongAttributes)
       # Validation needs a name
       form.define_singleton_method(:name) { "#{parent_name}_#{name}" }
       form.class_eval(&block)

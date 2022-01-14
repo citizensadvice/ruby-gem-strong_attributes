@@ -30,7 +30,8 @@ module StrongAttributes
       end
 
       def _define_nested_attributes(name, type, form = nil, default: nil, copy_errors: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
-        form ||= Helpers.create_anonymous_form(name, self.name, &block)
+        form = form.constantize if form.is_a? String
+        form = Helpers.create_anonymous_form(name, self.name, form, &block) if block_given?
         safe_setter name
         self._nested_attributes = _nested_attributes.merge(name => form)
         self._attribute_default_procs = _attribute_default_procs.merge(name => default) if default
