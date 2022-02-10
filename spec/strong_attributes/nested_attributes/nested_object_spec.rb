@@ -12,7 +12,10 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
 
     expect(test_class.new(object: { name: "foo" })).to have_attributes(
       object: have_attributes(
-        name: "foo"
+        name: "foo",
+        class: have_attributes(
+          name: "Object"
+        )
       )
     )
   end
@@ -65,6 +68,10 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     base_class = Class.new do
       include StrongAttributes
 
+      def name
+        "Base"
+      end
+
       def foo
         "bar"
       end
@@ -84,7 +91,10 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     expect(test).to have_attributes(
       object: have_attributes(
         name: "foo",
-        foo: "bar"
+        foo: "bar",
+        class: have_attributes(
+          name: "Object"
+        )
       )
     )
     expect(test.object).to be_a(MyClass)

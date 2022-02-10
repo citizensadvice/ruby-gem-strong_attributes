@@ -20,8 +20,14 @@ module StrongAttributes
           return if @reject_if && Helpers.reject?(value, @reject_if, context)
 
           if @allow_destroy && Helpers.destroy_flag?(value["_destroy"])
-            @value = nil
-          elsif @value
+            unless @value.respond_to?(:mark_for_destruction)
+              @value = nil
+              return
+            end
+            @value.mark_for_destruction
+          end
+
+          if @value
             # Already initialized, merge in known attributes
             @value.assign_attributes(value)
           else

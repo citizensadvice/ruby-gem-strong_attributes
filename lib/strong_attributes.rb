@@ -46,12 +46,12 @@ module StrongAttributes
   end
 
   def initialize(attributes = nil, param_name: nil, **kwargs)
-    kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
-    attributes = attributes.require(param_name).permit! if param_name
-    attributes ||= kwargs
+    attrs = attributes.require(param_name).permit! if param_name
+    attrs ||= attributes || kwargs
     @attributes = _default_attributes.deep_dup
+    kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
     _set_defaults
-    assign_attributes(attributes) if attributes
+    assign_attributes(attrs)
   end
 
   def assign_attributes(attributes)

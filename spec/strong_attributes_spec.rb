@@ -169,6 +169,18 @@ RSpec.describe StrongAttributes do
         expect(test_class.new({}, unsafe: "foo").unsafe).to eq "foo"
       end
     end
+
+    context "with an unknown setter" do
+      it "raises a NoMethodError" do
+        test_class = Class.new do
+          include StrongAttributes
+        end
+
+        expect do
+          test_class.new({}, unknown: "foo").unsafe
+        end.to raise_error NoMethodError
+      end
+    end
   end
 
   describe ".safe_setter" do

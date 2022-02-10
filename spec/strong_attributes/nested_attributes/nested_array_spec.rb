@@ -341,7 +341,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       ]
     end
 
-    context "when copy_errors if false" do
+    context "when copy_errors is false" do
       it "does not validate the nested attributes" do
         test_class = Class.new do
           include StrongAttributes
@@ -365,29 +365,94 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
   end
 
   describe "allow_destroy" do
-    let(:test_class) do
-      Class.new do
-        include StrongAttributes
+    context "when false" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
 
-        nested_array_attributes :array, allow_destroy: true do
-          attribute :name, :string
-          attribute :id, :integer
+          nested_array_attributes :array do
+            attribute :name, :string
+            attribute :id, :integer
+          end
         end
+      end
+
+      it "does not destroy" do
+        test = test_class.new(array: [name: "foo", id: 1])
+        test.array = [_destroy: "t", id: "1", name: "bar"]
+        expect(test.array).to match_array(
+          have_attributes(
+            name: "bar",
+            id: 1
+          )
+        )
       end
     end
 
-    it "sets a value if _destroy is not true" do
-      expect(test_class.new(array: [name: "foo", _destroy: "f"])).to have_attributes(
-        array: match([
-          have_attributes(name: "foo")
-        ])
-      )
+    context "when true" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_array_attributes :array, allow_destroy: true do
+            attribute :name, :string
+            attribute :id, :integer
+          end
+        end
+      end
+
+      it "sets a value if _destroy is not true" do
+        expect(test_class.new(array: [name: "foo", _destroy: "f"])).to have_attributes(
+          array: match([
+            have_attributes(name: "foo")
+          ])
+        )
+      end
+
+      it "removes the value is _destroy is true" do
+        test = test_class.new(array: [name: "foo", id: 1])
+        test.array = [_destroy: "t", id: "1"]
+        expect(test.array).to eq []
+      end
     end
 
-    it "removes the value is _destroy is true" do
-      test = test_class.new(array: [name: "foo", id: 1])
-      test.array = [_destroy: "t", id: "1"]
-      expect(test.array).to eq []
+    context "when true with a model supporting mark_for_destruction" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_array_attributes :array, allow_destroy: true do
+            attr_reader :destroy
+
+            attribute :name, :string
+            attribute :id, :integer
+
+            def mark_for_destruction
+              @destroy = true
+            end
+          end
+        end
+      end
+
+      it "does not call mark_for_destruction if _destroy is not true" do
+        expect(test_class.new(array: [name: "foo", _destroy: "f"])).to have_attributes(
+          array: match([
+            have_attributes(name: "foo", destroy: nil)
+          ])
+        )
+      end
+
+      it "calls mark_for_destruction if _destroy is true" do
+        test = test_class.new(array: [name: "foo", id: 1])
+        test.array = [_destroy: "t", id: "1", name: "bar"]
+        expect(test.array).to match_array(
+          have_attributes(
+            name: "bar",
+            id: 1,
+            destroy: true
+          )
+        )
+      end
     end
   end
 
@@ -498,6 +563,38 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       expect do
         test_class.new(array: [{ name: "bar" }, { name: "foo" }])
       end.to raise_error StrongAttributes::TooManyRecords
+    end
+  end
+
+  describe "replace" do
+    let(:test_class) do
+      Class.new do
+        include StrongAttributes
+
+        nested_array_attributes :array, replace: true do
+          attribute :name, :string
+          attribute :height, :float
+        end
+      end
+    end
+
+    it "sets attributes" do
+      expect(test_class.new(array: [name: "bar"])).to have_attributes(
+        array: match([
+          have_attributes(name: "bar", height: nil)
+        ])
+      )
+    end
+
+    it "replaced all existing attributes" do
+      test = test_class.new(array: [{ name: "bar", height: 1.0 }, { name: "foo" }])
+      test.array = [{ name: "foe" }]
+
+      expect(test).to have_attributes(
+        array: match([
+          have_attributes(name: "foe", height: nil)
+        ])
+      )
     end
   end
 end
