@@ -364,6 +364,46 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
     end
   end
 
+  describe "attributes_setter" do
+    context "when not set" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_array_attributes :array do
+            attribute :name, :string
+          end
+        end
+      end
+
+      it "creates an attribute setter" do
+        expect(test_class.new(array_attributes: [name: "foo"])).to have_attributes(
+          array: match([
+            have_attributes(
+              name: "foo"
+            )
+          ])
+        )
+      end
+    end
+
+    context "when false" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_array_attributes :array, attributes_setter: false do
+            attribute :name, :string
+          end
+        end
+      end
+
+      it "does not create an attributes setter" do
+        expect(test_class.new(array_attributes: { name: "foo" }).array).to eq nil
+      end
+    end
+  end
+
   describe "allow_destroy" do
     context "when false" do
       let(:test_class) do

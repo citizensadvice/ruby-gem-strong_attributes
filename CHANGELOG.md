@@ -1,5 +1,9 @@
 # Change log
 
+## v0.0.8
+
+- Add an attributes setter
+
 ## v0.0.7
 
 - Fixed confusing error message for an unknown setter

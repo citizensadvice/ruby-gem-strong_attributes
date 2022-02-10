@@ -10,7 +10,7 @@ GIT
 PATH
   remote: .
   specs:
-    strong_attributes (0.0.7)
+    strong_attributes (0.0.8)
       activemodel (>= 6.1.0)
 
 GEM

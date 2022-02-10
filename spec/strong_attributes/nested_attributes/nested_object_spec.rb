@@ -394,6 +394,47 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     end
   end
 
+  describe "attributes_setter" do
+    context "when not set" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_attributes :object do
+            attribute :name, :string
+          end
+        end
+      end
+
+      it "creates an attribute setter" do
+        expect(test_class.new(object_attributes: { name: "foo" })).to have_attributes(
+          object: have_attributes(
+            name: "foo",
+            class: have_attributes(
+              name: "Object"
+            )
+          )
+        )
+      end
+    end
+
+    context "when false" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_attributes :object, attributes_setter: false do
+            attribute :name, :string
+          end
+        end
+      end
+
+      it "does not create an attributes setter" do
+        expect(test_class.new(object_attributes: { name: "foo" }).object).to eq nil
+      end
+    end
+  end
+
   describe "allow_destroy" do
     let(:test_class) do
       Class.new do

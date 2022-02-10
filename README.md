@@ -136,6 +136,8 @@ Setting this allows `_destroy` to remove an existing nested object or array item
 
 ### `replace`
 
+### `attributes_setter`
+
 ## Param name
 
 ## Initializing with non-user values

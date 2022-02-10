@@ -29,10 +29,11 @@ module StrongAttributes
         end
       end
 
-      def _define_nested_attributes(name, type, form = nil, default: nil, copy_errors: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
+      def _define_nested_attributes(name, type, form = nil, default: nil, copy_errors: true, attributes_setter: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
         form = form.constantize if form.is_a? String
         form = Helpers.create_anonymous_form(name, self.name, form, &block) if block_given?
         safe_setter name
+        safe_setter "#{name}_attributes" if attributes_setter
         self._nested_attributes = _nested_attributes.merge(name => form)
         self._attribute_default_procs = _attribute_default_procs.merge(name => default) if default
         store = :"_nested_attribute_#{name}"
@@ -47,6 +48,7 @@ module StrongAttributes
           define_method "#{name}=" do |value|
             send(store).assign_value(value, self)
           end
+          alias_method "#{name}_attributes=", "#{name}=" if attributes_setter
         end
         validates_with CopyErrorsValidator, allow_blank: true, attributes: [name] if copy_errors
       end
