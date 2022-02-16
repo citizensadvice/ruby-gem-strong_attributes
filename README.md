@@ -11,6 +11,7 @@ This moves the responsibility for setting up your [`StrongParameters`](https://g
 
 Nested models, arrays, and proc/method defaults are also supported.
 
+
 ```ruby
 # Define a form
 class Form
