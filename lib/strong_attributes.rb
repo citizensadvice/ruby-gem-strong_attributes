@@ -17,6 +17,19 @@ module StrongAttributes
   include NestedAttributes
 
   class_methods do
+    # Add an attribute to the modal
+    #
+    # See ActiveModel documentation for Active Model Attribute Methods
+    #
+    # This also supports setting defaults using procs and methods
+    #
+    #   attribute :name, :string, default: -> { "Frank" }
+    #   attribute :name, :string, default: :default_method
+    #
+    # Additionally it supports array attributes
+    #
+    #   attribute :name, :array, :string
+    #
     def attribute(name, type = ActiveModel::Type::Value.new, subtype = nil, **options)
       if options[:default].is_a?(Proc) || options[:default].is_a?(Symbol)
         self._attribute_default_procs = _attribute_default_procs.merge(name => options.delete(:default))
@@ -28,12 +41,15 @@ module StrongAttributes
       end
     end
 
+    # Mark one or more setters as safe
+    #
+    # When the class is initialized matching keys will be passed to safe setters
     def safe_setter(*names)
       self._safe_setters = [*_safe_setters, *names.map(&:to_s)]
     end
 
-    # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L395
-    def inspect
+    def inspect # :nodoc:
+      # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L395
       attr_list = attribute_types.map { |name, type| "#{name}: #{type.type || 'object'}" } * ", "
       "#{name}(#{attr_list})"
     end
@@ -45,8 +61,14 @@ module StrongAttributes
     class_attribute :_safe_setters, default: []
   end
 
-  def initialize(attributes = nil, param_name: nil, **kwargs)
-    attrs = attributes.require(param_name).permit! if param_name
+  # Initialize the form object
+  #
+  # If initialized with only keyword arguments, or with only a hash, then only
+  # defined attributes and safe setters will be initialized from the input
+  #
+  # If initialized with a hash, and with keyword arguments, then all keyword arguments will be passed
+  # directly to the same named setters
+  def initialize(attributes = nil, **kwargs)
     attrs ||= attributes || kwargs
     @attributes = _default_attributes.deep_dup
     kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
@@ -54,13 +76,16 @@ module StrongAttributes
     assign_attributes(attrs)
   end
 
+  # Allows you to set all the attributes by passing in a hash of attributes
+  #
+  # Only attributes, and safe setters will be assigned to
   def assign_attributes(attributes)
     super _filter_attributes(attributes)
   end
   alias attributes= assign_attributes
 
-  # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L669
-  def inspect
+  def inspect # :nodoc:
+    # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L669
     inspection = if defined?(@attributes) && @attributes
                    self.class.attribute_names.collect do |name|
                      "#{name}: #{send(name).inspect}"

@@ -161,6 +161,18 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     )
   end
 
+  it "names inline definitions" do
+    test_class = Class.new do
+      include StrongAttributes
+
+      nested_attributes :object do
+        attribute :name, :string
+      end
+    end
+
+    expect(test_class.new(object: { name: "foo" }).object.class.name).to eq "Object"
+  end
+
   describe "default values" do
     it "sets fixed defaults" do
       test_class = Class.new do
@@ -542,6 +554,34 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
           object: nil
         )
       end
+    end
+  end
+
+  describe "replace" do
+    let(:test_class) do
+      Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, replace: true do
+          attribute :name, :string
+          attribute :height, :float
+        end
+      end
+    end
+
+    it "sets attributes" do
+      expect(test_class.new(object: { name: "bar" })).to have_attributes(
+        object: have_attributes(name: "bar", height: nil)
+      )
+    end
+
+    it "replaces all existing attributes" do
+      test = test_class.new(object: { name: "bar", height: 1.0 })
+      test.object = { name: "foe" }
+
+      expect(test).to have_attributes(
+        object: have_attributes(name: "foe", height: nil)
+      )
     end
   end
 end

@@ -65,22 +65,6 @@ RSpec.describe StrongAttributes do
         expect(test_class.new({ "name" => "foo" }).name).to eq "foo"
       end
     end
-
-    context "with strong params" do
-      it "sets a known attribute" do
-        test_class = Class.new do
-          include StrongAttributes
-          attribute :name, :string
-        end
-
-        # rubocop:disable RSpec/VerifiedDoubles
-        param = double("ActionController::Parameters", permit!: { name: "foo" })
-        params = double("ActionController::Parameters", require: param)
-        # rubocop:enable RSpec/VerifiedDoubles
-        expect(test_class.new(params, param_name: "namespace").name).to eq "foo"
-        expect(params).to have_received(:require).with("namespace")
-      end
-    end
   end
 
   describe "array attributes" do
@@ -132,6 +116,21 @@ RSpec.describe StrongAttributes do
 
       it "creates an attribute that saves items as an array" do
         expect(test_class.new(name: %w[foo bar]).name).to eq %w[foo bar]
+      end
+    end
+
+    context "when modified in place" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+          attribute :name, :array, :string
+        end
+      end
+
+      it "creates an attribute that converts items to an array" do
+        test = test_class.new(name: "foo")
+        test.name << "bar"
+        expect(test.name_changed?).to eq true
       end
     end
   end
@@ -230,6 +229,15 @@ RSpec.describe StrongAttributes do
 
         expect(test_class.new.changed?).to eq false
       end
+
+      it "does set dirty if overridden" do
+        test_class = Class.new do
+          include StrongAttributes
+          attribute :name, :string, default: "foo"
+        end
+
+        expect(test_class.new(name: "bar").changed?).to eq true
+      end
     end
 
     context "with a proc default" do
@@ -262,7 +270,7 @@ RSpec.describe StrongAttributes do
       it "does not set dirty" do
         test_class = Class.new do
           include StrongAttributes
-          attribute :name, :string, default: "foo"
+          attribute :name, :string, default: -> { "foo" }
         end
 
         expect(test_class.new.changed?).to eq false
@@ -275,6 +283,15 @@ RSpec.describe StrongAttributes do
         end
 
         expect(test_class.new(name: "bar").name).to eq "bar"
+      end
+
+      it "does set dirty if overridden" do
+        test_class = Class.new do
+          include StrongAttributes
+          attribute :name, :string, default: -> { "foo" }
+        end
+
+        expect(test_class.new(name: "bar").changed?).to eq true
       end
     end
 
@@ -316,6 +333,19 @@ RSpec.describe StrongAttributes do
         end
 
         expect(test_class.new(name: "bar").name).to eq "bar"
+      end
+
+      it "does set dirty if overridden" do
+        test_class = Class.new do
+          include StrongAttributes
+          attribute :name, :string, default: :default_value
+
+          def default_value
+            "foo"
+          end
+        end
+
+        expect(test_class.new(name: "bar").changed?).to eq true
       end
     end
   end

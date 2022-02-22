@@ -3,7 +3,7 @@
 require "strong_attributes/too_many_records"
 
 module StrongAttributes
-  module NestedAttributes
+  module NestedAttributes # :nodoc:
     class NestedArray
       attr_reader :value
 
@@ -44,11 +44,12 @@ module StrongAttributes
       end
 
       def id_key
-        @_id_key = @form.class.try(:primary_key) || "id"
+        key = @form.try(:primary_key)
+        key == false ? nil : key || "id"
       end
 
       def find_from_id(value)
-        @value.find { |i| i.try(id_key)&.to_s == value[id_key].to_s } if value[id_key].present?
+        @value.find { |i| i.try(id_key)&.to_s == value[id_key].to_s } if id_key && value[id_key].present?
       end
 
       def set_attributes(item, context)

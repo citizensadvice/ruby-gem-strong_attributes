@@ -62,6 +62,18 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
     )
   end
 
+  it "names inline definitions" do
+    test_class = Class.new do
+      include StrongAttributes
+
+      nested_array_attributes :people do
+        attribute :name, :string
+      end
+    end
+
+    expect(test_class.new(people: [name: "foo"]).people.first.class.name).to eq "Person"
+  end
+
   describe "default values" do
     it "sets fixed defaults" do
       test_class = Class.new do
@@ -261,14 +273,14 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
         Class.new do
           include StrongAttributes
 
-          def self.primary_key
-            "foo"
-          end
-
           nested_array_attributes :array do
             attribute :id, :integer
             attribute :foo, :integer
             attribute :name, :string
+
+            def self.primary_key
+              "foo"
+            end
           end
         end
       end
@@ -276,13 +288,43 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       it "matches against the defined primary key" do
         test = test_class.new(array: [{ name: "foo", id: 1, foo: 2 }])
         test.array = [
-          { name: "bar", id: "1", foo: "2" },
-          { name: "foe", id: "3", foo: "4" }
+          { name: "bar", id: "3", foo: "2" },
+          { name: "foe", id: "1", foo: "4" }
         ]
         expect(test).to have_attributes(
           array: match([
-            have_attributes(name: "bar", id: 1, foo: 2),
-            have_attributes(name: "foe", id: 3, foo: 4)
+            have_attributes(name: "bar", id: 3, foo: 2),
+            have_attributes(name: "foe", id: 1, foo: 4)
+          ])
+        )
+      end
+    end
+
+    context "with primary_key set to false" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_array_attributes :array do
+            attribute :id, :integer
+            attribute :name, :string
+
+            def self.primary_key
+              false
+            end
+          end
+        end
+      end
+
+      it "does not against a primary key" do
+        test = test_class.new(array: [{ name: "foo", id: 1 }])
+        test.array = [
+          { name: "bar", id: "1" }
+        ]
+        expect(test).to have_attributes(
+          array: match([
+            have_attributes(name: "foo", id: 1),
+            have_attributes(name: "bar", id: 1)
           ])
         )
       end
@@ -626,7 +668,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       )
     end
 
-    it "replaced all existing attributes" do
+    it "replaces all existing attributes" do
       test = test_class.new(array: [{ name: "bar", height: 1.0 }, { name: "foo" }])
       test.array = [{ name: "foe" }]
 
