@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
-# Copy errors from a model, or array of models
-#
-# To customise error messages using I18n see
-# https://bigbinary.com/blog/rails-6-allows-to-override-the-activemodel-errors-full_message-format-at-the-model-level-and-at-the-attribute-level
-#
-# By default the errors will have the names :"model.attribute", or :"model[0].attribute"
-# This matches how nested attributes errors are named
-#
 module StrongAttributes
+  # Copy errors from a model, or array of models
+  #
+  # To customise error messages using I18n see
+  # https://bigbinary.com/blog/rails-6-allows-to-override-the-activemodel-errors-full_message-format-at-the-model-level-and-at-the-attribute-level
+  #
+  # By default the errors will have the names :"model.attribute", or :"model[0].attribute"
+  # This matches how nested attributes errors are named
   class CopyErrorsValidator < ActiveModel::EachValidator
     def validate_each(record, attribute, values)
       return record.errors.add(attribute, :blank) if values.blank?

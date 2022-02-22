@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 module StrongAttributes
-  module NestedAttributes
+  module NestedAttributes # :nodoc:
     class NestedObject
       attr_reader :value
 
-      def initialize(form, allow_destroy: false, reject_if: nil)
+      def initialize(form, allow_destroy: false, reject_if: nil, replace: false)
         @form = form
         @allow_destroy = allow_destroy
         @reject_if = reject_if
+        @replace = replace
       end
 
       def assign_value(value, context)
@@ -27,7 +28,7 @@ module StrongAttributes
             @value.mark_for_destruction
           end
 
-          if @value
+          if @value && !@replace
             # Already initialized, merge in known attributes
             @value.assign_attributes(value)
           else

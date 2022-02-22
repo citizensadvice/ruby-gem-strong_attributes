@@ -1,5 +1,13 @@
 # Change log
 
+## v0.0.9
+
+- Added the `replace` option to `nested_attributes`
+- Fix support for `primary_key` and allow for a false value
+- Fix array attribute supporting changes in place
+- Remove the `param_name` option.
+- `nested_array_attributes` will name anonymous classes using singular names
+
 ## v0.0.8
 
 - Add an attributes setter
