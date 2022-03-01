@@ -1,5 +1,9 @@
 # Change log
 
+## v0.0.10
+
+- Changed the initialization order so default values are set after the attributes are set
+
 ## v0.0.9
 
 - Added the `replace` option to `nested_attributes`
