@@ -173,12 +173,12 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     expect(test_class.new(object: { name: "foo" }).object.class.name).to eq "Object"
   end
 
-  describe "default values" do
-    it "sets fixed defaults" do
+  describe "initial values" do
+    it "sets fixed initial values" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_attributes :object, default: { name: "foo" } do
+        nested_attributes :object, initial_value: { name: "foo" } do
           attribute :name, :string
         end
       end
@@ -190,11 +190,11 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       )
     end
 
-    it "sets proc defaults" do
+    it "sets initial values by proc" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_attributes :object, default: -> { { name: "foo" } } do
+        nested_attributes :object, initial_value: -> { { name: "foo" } } do
           attribute :name, :string
         end
       end
@@ -206,11 +206,11 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       )
     end
 
-    it "sets method defaults" do
+    it "sets initial value by method" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_attributes :object, default: :default_value do
+        nested_attributes :object, initial_value: :default_value do
           attribute :name, :string
         end
 
@@ -226,11 +226,11 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       )
     end
 
-    it "replaces default" do
+    it "merges values into the initial value" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_attributes :object, default: { name: "foo" } do
+        nested_attributes :object, initial_value: { name: "foo" } do
           attribute :name, :string
           attribute :number, :float
         end
@@ -238,7 +238,8 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
 
       expect(test_class.new(object: { number: 1 })).to have_attributes(
         object: have_attributes(
-          number: 1.0
+          number: 1.0,
+          name: "foo"
         )
       )
     end
@@ -342,7 +343,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
           "Form"
         end
 
-        nested_attributes :object, default: {} do
+        nested_attributes :object, initial_value: {} do
           attribute :name, :string
           attribute :number, :float
 
@@ -367,7 +368,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
             "Form"
           end
 
-          nested_attributes :object, default: {}, copy_errors: false do
+          nested_attributes :object, initial_value: {}, copy_errors: false do
             attribute :name, :string
             attribute :number, :float
 
@@ -389,7 +390,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
             "Class"
           end
 
-          nested_attributes :object, default: {}, copy_errors: false do
+          nested_attributes :object, initial_value: {}, copy_errors: false do
             attribute :name, :string
             validates :name, presence: true
           end
@@ -581,6 +582,25 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       expect(test).to have_attributes(
         object: have_attributes(name: "foe", height: nil)
       )
+    end
+
+    context "with an initial value" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_attributes :object, replace: true, initial_value: -> { { name: "foo" } } do
+            attribute :name, :string
+            attribute :height, :float
+          end
+        end
+      end
+
+      it "replaces the initial value" do
+        expect(test_class.new(object: { height: 1 })).to have_attributes(
+          object: have_attributes(name: nil, height: 1)
+        )
+      end
     end
   end
 end

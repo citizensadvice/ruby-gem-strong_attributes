@@ -199,6 +199,38 @@ RSpec.describe StrongAttributes do
         unsafe: nil
       )
     end
+
+    context "with an already set attribute" do
+      it "is not replaced by the default" do
+        test_class = Class.new do
+          include StrongAttributes
+
+          safe_setter :complex_setter
+
+          attribute :foo, :string, default: "foo"
+          attribute :bar, :string, default: -> { "bar" }
+          attribute :fee, :boolean, default: -> { true }
+
+          def complex_setter=(value)
+            self.foo = value
+            self.bar = value
+            self.fee = false
+          end
+        end
+
+        expect(test_class.new).to have_attributes(
+          foo: "foo",
+          bar: "bar",
+          fee: true
+        )
+
+        expect(test_class.new(complex_setter: "fizz")).to have_attributes(
+          foo: "fizz",
+          bar: "fizz",
+          fee: false
+        )
+      end
+    end
   end
 
   describe "setting attributes with defaults" do

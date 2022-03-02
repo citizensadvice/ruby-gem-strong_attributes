@@ -1,5 +1,10 @@
 # Change log
 
+## v0.0.11
+
+- Nested and array attributes now take `initial_value` rather than `default`
+- Do not set a default value using a proc if the getter returns anything but nil
+
 ## v0.0.10
 
 - Changed the initialization order so default values are set after the attributes are set
