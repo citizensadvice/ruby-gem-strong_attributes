@@ -58,6 +58,7 @@ module StrongAttributes
   included do
     attribute_method_suffix "?", "_before_type_cast", "_came_from_user?"
     class_attribute :_attribute_default_procs, default: {}
+    class_attribute :_attribute_initial_procs, default: {}
     class_attribute :_safe_setters, default: []
   end
 
@@ -72,6 +73,7 @@ module StrongAttributes
     attrs ||= attributes || kwargs
     @attributes = _default_attributes.deep_dup
     kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
+    _set_initial_values
     assign_attributes(attrs)
     _set_defaults(attrs)
   end
@@ -99,7 +101,7 @@ module StrongAttributes
 
   private
 
-  delegate :_attribute_default_procs, :_safe_setters, :_default_attributes, to: :class, private: true
+  delegate :_attribute_default_procs, :_attribute_initial_procs, :_safe_setters, :_default_attributes, to: :class, private: true
 
   # Used by the numericality validator to detect invalid numbers
   def attribute_before_type_cast(attr_name)
@@ -115,9 +117,20 @@ module StrongAttributes
     attributes[attr_name].present?
   end
 
+  def _set_initial_values
+    _attribute_initial_procs.each do |name, value|
+      value = Helpers.default_value(name, value, self)
+      if @attributes.key?(name.to_s)
+        @attributes.write_from_database(name.to_s, value)
+      else
+        public_send("#{name}=", value)
+      end
+    end
+  end
+
   def _set_defaults(attrs)
     _attribute_default_procs.each do |name, value|
-      next if attrs.key?(name)
+      next if attrs.key?(name) || !public_send(name).nil?
 
       value = Helpers.default_value(name, value, self)
       if @attributes.key?(name.to_s)

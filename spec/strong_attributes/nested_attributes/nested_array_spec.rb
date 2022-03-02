@@ -74,12 +74,12 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
     expect(test_class.new(people: [name: "foo"]).people.first.class.name).to eq "Person"
   end
 
-  describe "default values" do
-    it "sets fixed defaults" do
+  describe "initial_value" do
+    it "sets fixed initial value" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_array_attributes :array, default: [name: "foo"] do
+        nested_array_attributes :array, initial_value: [name: "foo"] do
           attribute :name, :string
         end
       end
@@ -93,11 +93,11 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       )
     end
 
-    it "sets proc defaults" do
+    it "sets initial value from proc" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_array_attributes :array, default: -> { [name: "foo"] } do
+        nested_array_attributes :array, initial_value: -> { [name: "foo"] } do
           attribute :name, :string
         end
       end
@@ -111,11 +111,11 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       )
     end
 
-    it "sets method defaults" do
+    it "sets initial value from method" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_array_attributes :array, default: :default_value do
+        nested_array_attributes :array, initial_value: :default_value do
           attribute :name, :string
         end
 
@@ -133,17 +133,20 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       )
     end
 
-    it "replaces defaults" do
+    it "merges values into initial values" do
       test_class = Class.new do
         include StrongAttributes
 
-        nested_array_attributes :array, default: [name: "foo"] do
+        nested_array_attributes :array, initial_value: [name: "foo"] do
           attribute :name, :string
         end
       end
 
       expect(test_class.new(array: [name: "bar"])).to have_attributes(
         array: match([
+          have_attributes(
+            name: "foo"
+          ),
           have_attributes(
             name: "bar"
           )
@@ -364,7 +367,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
           "Form"
         end
 
-        nested_array_attributes :array, default: [{}] do
+        nested_array_attributes :array, initial_value: [{}] do
           attribute :name, :string
           attribute :number, :float
 
@@ -674,6 +677,27 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
           have_attributes(name: "foe", height: nil)
         ])
       )
+    end
+
+    context "with a default" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+
+          nested_array_attributes :array, initial_value: -> { [name: "foo"] }, replace: true do
+            attribute :name, :string
+            attribute :height, :float
+          end
+        end
+      end
+
+      it "replaces attributes" do
+        expect(test_class.new(array: [name: "bar"])).to have_attributes(
+          array: match([
+            have_attributes(name: "bar", height: nil)
+          ])
+        )
+      end
     end
   end
 end
