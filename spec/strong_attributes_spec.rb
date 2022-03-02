@@ -293,6 +293,16 @@ RSpec.describe StrongAttributes do
 
         expect(test_class.new(name: "bar").changed?).to eq true
       end
+
+      it "allows defaults to be based on previous attributes" do
+        test_class = Class.new do
+          include StrongAttributes
+          attribute :hello, :string
+          attribute :name, :string, default: -> { "#{hello} World!" }
+        end
+
+        expect(test_class.new(hello: "Greetings").name).to eq "Greetings World!"
+      end
     end
 
     context "with a symbol default" do
@@ -346,6 +356,20 @@ RSpec.describe StrongAttributes do
         end
 
         expect(test_class.new(name: "bar").changed?).to eq true
+      end
+
+      it "allows defaults to be based on previous attributes" do
+        test_class = Class.new do
+          include StrongAttributes
+          attribute :hello, :string
+          attribute :name, :string, default: :default_value
+
+          def default_value
+            "#{hello} World!"
+          end
+        end
+
+        expect(test_class.new(hello: "Greetings").name).to eq "Greetings World!"
       end
     end
   end

@@ -133,7 +133,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       )
     end
 
-    it "merges values into defaults" do
+    it "replaces defaults" do
       test_class = Class.new do
         include StrongAttributes
 
@@ -144,9 +144,6 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
 
       expect(test_class.new(array: [name: "bar"])).to have_attributes(
         array: match([
-          have_attributes(
-            name: "foo"
-          ),
           have_attributes(
             name: "bar"
           )

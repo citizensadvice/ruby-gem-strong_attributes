@@ -226,7 +226,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       )
     end
 
-    it "merges values into defaults" do
+    it "replaces default" do
       test_class = Class.new do
         include StrongAttributes
 
@@ -238,7 +238,6 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
 
       expect(test_class.new(object: { number: 1 })).to have_attributes(
         object: have_attributes(
-          name: "foo",
           number: 1.0
         )
       )

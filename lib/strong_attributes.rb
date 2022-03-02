@@ -72,8 +72,8 @@ module StrongAttributes
     attrs ||= attributes || kwargs
     @attributes = _default_attributes.deep_dup
     kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
-    _set_defaults
     assign_attributes(attrs)
+    _set_defaults(attrs)
   end
 
   # Allows you to set all the attributes by passing in a hash of attributes
@@ -115,8 +115,10 @@ module StrongAttributes
     attributes[attr_name].present?
   end
 
-  def _set_defaults
+  def _set_defaults(attrs)
     _attribute_default_procs.each do |name, value|
+      next if attrs.key?(name)
+
       value = Helpers.default_value(name, value, self)
       if @attributes.key?(name.to_s)
         @attributes.write_from_database(name.to_s, value)
