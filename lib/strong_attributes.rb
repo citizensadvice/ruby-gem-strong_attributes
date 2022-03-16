@@ -7,7 +7,7 @@ require "strong_attributes/helpers"
 require "strong_attributes/nested_attributes"
 require "strong_attributes/type/array"
 
-module StrongAttributes
+module StrongAttributes # rubocop:disable Metrics/ModuleLength
   extend ActiveSupport::Concern
 
   include ActiveModel::Model
@@ -90,7 +90,7 @@ module StrongAttributes
     # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L669
     inspection = if defined?(@attributes) && @attributes
                    self.class.attribute_names.collect do |name|
-                     "#{name}: #{send(name).inspect}"
+                     "#{name}: #{attribute_for_inspect(name)}"
                    end.compact.join(", ")
                  else
                    "not initialized"
@@ -147,5 +147,16 @@ module StrongAttributes
 
   def safe_setters
     _default_attributes.keys + _safe_setters
+  end
+
+  def attribute_for_inspect(attr_name)
+    value = send(attr_name)
+    if value.is_a?(String) && value.length > 50
+      "#{value[0, 50]}...".inspect
+    elsif value.is_a?(Date) || value.is_a?(Time)
+      value.to_s.inspect
+    else
+      value.inspect
+    end
   end
 end

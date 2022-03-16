@@ -1,5 +1,9 @@
 # Change log
 
+## v0.0.12
+
+- Inspect will truncate long string and escape dates
+
 ## v0.0.11
 
 - Nested and array attributes now take `initial_value` rather than `default`

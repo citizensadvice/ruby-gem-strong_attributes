@@ -748,11 +748,12 @@ RSpec.describe StrongAttributes do
 
         attribute :name, :string
         attribute :number, :float
+        attribute :date, :date
       end
     end
 
     it "gives a pretty inspect" do
-      expect(test_class.new(name: "foo").inspect).to eq '#<Test name: "foo", number: nil>'
+      expect(test_class.new(name: "foo", date: Date.new).inspect).to eq '#<Test name: "foo", number: nil, date: "-4712-01-01">'
     end
   end
 end
