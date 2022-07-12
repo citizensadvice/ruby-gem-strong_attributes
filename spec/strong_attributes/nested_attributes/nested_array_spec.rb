@@ -441,7 +441,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       end
 
       it "does not create an attributes setter" do
-        expect(test_class.new(array_attributes: { name: "foo" }).array).to eq nil
+        expect(test_class.new(array_attributes: { name: "foo" }).array).to be_nil
       end
     end
   end

@@ -442,7 +442,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       end
 
       it "does not create an attributes setter" do
-        expect(test_class.new(object_attributes: { name: "foo" }).object).to eq nil
+        expect(test_class.new(object_attributes: { name: "foo" }).object).to be_nil
       end
     end
   end
@@ -469,7 +469,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     it "removes the value is _destroy is true" do
       test = test_class.new(object: { name: "foo" })
       test.object = { _destroy: "t" }
-      expect(test.object).to eq nil
+      expect(test.object).to be_nil
     end
   end
 
