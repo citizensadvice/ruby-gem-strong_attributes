@@ -29,7 +29,7 @@ RSpec.describe StrongAttributes do
           attribute :name, :string
         end
 
-        expect(test_class.new(unknown: "foo").unknown).to eq nil
+        expect(test_class.new(unknown: "foo").unknown).to be_nil
       end
     end
 
@@ -51,7 +51,7 @@ RSpec.describe StrongAttributes do
           attribute :name, :string
         end
 
-        expect(test_class.new({ unknown: "foo" }).unknown).to eq nil
+        expect(test_class.new({ unknown: "foo" }).unknown).to be_nil
       end
     end
 
@@ -130,7 +130,7 @@ RSpec.describe StrongAttributes do
       it "creates an attribute that converts items to an array" do
         test = test_class.new(name: "foo")
         test.name << "bar"
-        expect(test.name_changed?).to eq true
+        expect(test.name_changed?).to be true
       end
     end
   end
@@ -143,7 +143,7 @@ RSpec.describe StrongAttributes do
           attr_accessor :unsafe
         end
 
-        expect(test_class.new(unsafe: "foo").unsafe).to eq nil
+        expect(test_class.new(unsafe: "foo").unsafe).to be_nil
       end
     end
 
@@ -154,7 +154,7 @@ RSpec.describe StrongAttributes do
           attr_accessor :unsafe
         end
 
-        expect(test_class.new({ "unsafe" => "foo" }).unsafe).to eq nil
+        expect(test_class.new({ "unsafe" => "foo" }).unsafe).to be_nil
       end
     end
 
@@ -259,7 +259,7 @@ RSpec.describe StrongAttributes do
           attribute :name, :string, default: "foo"
         end
 
-        expect(test_class.new.changed?).to eq false
+        expect(test_class.new.changed?).to be false
       end
 
       it "does set dirty if overridden" do
@@ -268,7 +268,7 @@ RSpec.describe StrongAttributes do
           attribute :name, :string, default: "foo"
         end
 
-        expect(test_class.new(name: "bar").changed?).to eq true
+        expect(test_class.new(name: "bar").changed?).to be true
       end
     end
 
@@ -296,7 +296,7 @@ RSpec.describe StrongAttributes do
           end
         end
 
-        expect(test_class.new.changed?).to eq false
+        expect(test_class.new.changed?).to be false
       end
 
       it "does not set dirty" do
@@ -305,7 +305,7 @@ RSpec.describe StrongAttributes do
           attribute :name, :string, default: -> { "foo" }
         end
 
-        expect(test_class.new.changed?).to eq false
+        expect(test_class.new.changed?).to be false
       end
 
       it "allows the default to be overridden" do
@@ -323,7 +323,7 @@ RSpec.describe StrongAttributes do
           attribute :name, :string, default: -> { "foo" }
         end
 
-        expect(test_class.new(name: "bar").changed?).to eq true
+        expect(test_class.new(name: "bar").changed?).to be true
       end
 
       it "allows defaults to be based on previous attributes" do
@@ -361,7 +361,7 @@ RSpec.describe StrongAttributes do
           end
         end
 
-        expect(test_class.new.changed?).to eq false
+        expect(test_class.new.changed?).to be false
       end
 
       it "allows the default to be overridden" do
@@ -387,7 +387,7 @@ RSpec.describe StrongAttributes do
           end
         end
 
-        expect(test_class.new(name: "bar").changed?).to eq true
+        expect(test_class.new(name: "bar").changed?).to be true
       end
 
       it "allows defaults to be based on previous attributes" do
@@ -447,7 +447,7 @@ RSpec.describe StrongAttributes do
           attribute :name, :boolean
         end
 
-        expect(test_class.new(name: "y").name).to eq true
+        expect(test_class.new(name: "y").name).to be true
       end
     end
 
@@ -527,7 +527,7 @@ RSpec.describe StrongAttributes do
 
       test = test_class.new
       test.assign_attributes(unsafe: "foo")
-      expect(test.unsafe).to eq nil
+      expect(test.unsafe).to be_nil
     end
 
     it "assigns to safe setters" do
@@ -575,7 +575,7 @@ RSpec.describe StrongAttributes do
 
       test = test_class.new
       test.attributes = { unsafe: "foo" }
-      expect(test.unsafe).to eq nil
+      expect(test.unsafe).to be_nil
     end
 
     it "assigns to safe setters" do
@@ -644,7 +644,7 @@ RSpec.describe StrongAttributes do
       end
 
       test = test_class.new
-      expect(test.invalid?).to eq true
+      expect(test.invalid?).to be true
       expect(test.errors.full_messages).to eq ["Name can't be blank"]
     end
 
@@ -662,7 +662,7 @@ RSpec.describe StrongAttributes do
       end
 
       test = test_class.new(number: "foo")
-      expect(test.invalid?).to eq true
+      expect(test.invalid?).to be true
       expect(test.errors.full_messages).to eq ["Number is not a number"]
     end
 
@@ -697,8 +697,8 @@ RSpec.describe StrongAttributes do
         attribute :number, :float
       end
 
-      expect(test_class.new.number?).to eq false
-      expect(test_class.new(number: 0).number?).to eq true
+      expect(test_class.new.number?).to be false
+      expect(test_class.new(number: 0).number?).to be true
     end
   end
 

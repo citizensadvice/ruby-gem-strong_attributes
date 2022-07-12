@@ -1,5 +1,9 @@
 # Change log
 
+## v1.0.0
+
+- No changes
+
 ## v0.0.12
 
 - Inspect will truncate long string and escape dates
