@@ -245,6 +245,93 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     end
   end
 
+  describe "default value" do
+    it "sets a default value" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, default: { name: "foo" } do
+          attribute :name, :string
+        end
+      end
+
+      expect(test_class.new).to have_attributes(
+        object: have_attributes(
+          name: "foo"
+        )
+      )
+    end
+
+    it "sets default values by proc" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, default: -> { { name: "foo" } } do
+          attribute :name, :string
+        end
+      end
+
+      expect(test_class.new).to have_attributes(
+        object: have_attributes(
+          name: "foo"
+        )
+      )
+    end
+
+    it "sets default value by method" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, default: :default_value do
+          attribute :name, :string
+        end
+
+        def default_value
+          { name: "foo" }
+        end
+      end
+
+      expect(test_class.new).to have_attributes(
+        object: have_attributes(
+          name: "foo"
+        )
+      )
+    end
+
+    it "does not call default if value is set" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, default: -> { raise "Error" } do
+          attribute :name, :string
+          attribute :number, :float
+        end
+      end
+
+      expect(test_class.new(object: { number: 1 })).to have_attributes(
+        object: have_attributes(
+          number: 1.0,
+          name: nil
+        )
+      )
+    end
+
+    it "does not call default if value is set to nil" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, default: -> { raise "Error" } do
+          attribute :name, :string
+          attribute :number, :float
+        end
+      end
+
+      expect(test_class.new(object: nil)).to have_attributes(
+        object: nil
+      )
+    end
+  end
+
   describe "setting attributes" do
     let(:test_class) do
       Class.new do

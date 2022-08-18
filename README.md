@@ -334,9 +334,11 @@ form.person = { _destroy: true }
 form.person # => nil
 ```
 
-### Initial values
+### Initial value
 
 Initial values can be set using a proc, or symbol referring to a method.
+
+This is called before the value is set by the user.
 
 ```ruby
 class Form
@@ -352,9 +354,30 @@ form = Form.new(person: { date_of_birth: "1980-01-01" } })
 form.person # => <Person date_of_birth=1980-01-01 name="Bob">
 ```
 
+### Default value
+
+The default value can be set using a proc, or symbol referring to a method.
+
+This is only called if no value is set by the user.
+
+```ruby
+class Form
+  include StrongAttributes
+
+  nested_attributes :person, default: -> { { name: "Bob" } } do
+    attribute :name, :string
+    attribute :date_of_birth, :date
+  end  
+end
+
+form = Form.new
+form.person # => <Person date_of_birth=nil name="Bob">
+```
+
 ### Options
 
-- **`initial_value`**: The initial value, can also be be a proc or a symbol
+- **`initial_value`**: The initial value, can be a value, proc or a symbol
+- **`default`**: The default value if no value is set, can be a value, proc or a symbol
 - **`allow_destroy`** (`boolean`): if `true` if a `_destroy: true` key is passed then an existing record will be set to `nil`, or `mark_for_destruction`, will be called if the object responds to that method.
 - **`reject_if`** (`proc`): if the proc returns true the update will be rejected/
 - **`replace`** (`boolean`): if `true` an update will replace the existing record rather than merging values in.
@@ -456,6 +479,8 @@ form.people # => [<Person id=2 name="Harry">]
 
 Initial values can be set using a proc, or symbol referring to a method.
 
+This is called before the value is set by the user.
+
 ```ruby
 class Form
   include StrongAttributes
@@ -470,9 +495,30 @@ form = Form.new({ people: [name: "Bob"] })
 form.people # => [<Person name="Bob">, <Person name="Frank">]
 ```
 
+### Default value
+
+The default value can be set using a proc, or symbol referring to a method.
+
+This is only called if no value is set by the user.
+
+```ruby
+class Form
+  include StrongAttributes
+
+  nested_array_attributes :people, default: -> { [name: "Frank"] } do
+    attribute :name, :string
+    attribute :date_of_birth, :date
+  end  
+end
+
+form = Form.new()
+form.people # => [<Person name="Frank">]
+```
+
 ### Options
 
-- **`initial_value`**: The initial value, can also be be a proc or a symbol
+- **`initial_value`**: The initial value, can be a value, proc or a symbol
+- **`default`**: The default value if not value is set, can be a value, proc or a symbol
 - **`allow_destroy`** (`boolean`): if `true` if a `_destroy: true` key is passed then an existing record will either be removed, or `mark_for_destruction`, will be called if the object responds to that method.
 - **`reject_if`** (`proc`): If the proc returns true the update will be rejected
 - **`limit`** (`Integer`): If provided, raise a `TooManyRecords` error if the limit is exceeded
