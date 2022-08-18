@@ -315,6 +315,21 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
         )
       )
     end
+
+    it "does not call default if value is set to nil" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, default: -> { raise "Error" } do
+          attribute :name, :string
+          attribute :number, :float
+        end
+      end
+
+      expect(test_class.new(object: nil)).to have_attributes(
+        object: nil
+      )
+    end
   end
 
   describe "setting attributes" do

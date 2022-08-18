@@ -231,6 +231,20 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
         ])
       )
     end
+
+    it "does not call default if value is set to nil" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_array_attributes :array, default: -> { raise "Error" } do
+          attribute :name, :string
+        end
+      end
+
+      expect(test_class.new(array: nil)).to have_attributes(
+        array: nil
+      )
+    end
   end
 
   describe "setting attributes" do
@@ -757,7 +771,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       )
     end
 
-    context "with a default" do
+    context "with an initial value" do
       let(:test_class) do
         Class.new do
           include StrongAttributes
