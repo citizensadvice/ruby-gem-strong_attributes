@@ -29,7 +29,8 @@ module StrongAttributes
       #
       # Options are
       #
-      # - default - default value, can be a value, proc, or symbol referring to a method name
+      # - initial_value - the initial value can be a value, proc, or symbol referring to a method name
+      # - default - default value if unset, can be a value, proc, or symbol referring to a method name
       # - copy_errors - defaults to `true`, copy validation errors to the parent form during validation
       # - attribute_setter - defaults to `true` - create a `name_attributes=` setter for compatibility with Rails `fields_for` helper
       # - allow_destroy - defaults to `false` - allow the user to use the `_destroy` key to remove the object
@@ -60,7 +61,8 @@ module StrongAttributes
       #
       # Options are
       #
-      # - default - default value, can be a value, proc, or symbol referring to a method name
+      # - initial_value - the initial value can be a value, proc, or symbol referring to a method name
+      # - default_value - the default value if unset can be a value, proc, or symbol referring to a method name
       # - copy_errors - defaults to `true`, copy validation errors to the parent form during validation
       # - attribute_setter - defaults to `true` - create a `name_attributes=` setter for compatibility with Rails `fields_for` helper
       # - allow_destroy - defaults to `false` - allow the user to use the `_destroy` key to remove the object
@@ -84,13 +86,14 @@ module StrongAttributes
         end
       end
 
-      def _define_nested_attributes(name, type, form = nil, initial_value: nil, copy_errors: true, attributes_setter: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists, Layout/LineLength
+      def _define_nested_attributes(name, type, form = nil, initial_value: nil, default: nil, copy_errors: true, attributes_setter: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists, Layout/LineLength
         form = form.constantize if form.is_a? String
         form = Helpers.create_anonymous_form(name, self.name, form, &block) if block_given?
         safe_setter name
         safe_setter "#{name}_attributes" if attributes_setter
         self._nested_attributes = _nested_attributes.merge(name => form)
         self._attribute_initial_procs = _attribute_initial_procs.merge(name => initial_value) if initial_value
+        self._attribute_default_procs = _attribute_default_procs.merge(name => default) if default
         store = :"_nested_attribute_#{name}"
         _nested_methods.module_eval do
           define_method store do

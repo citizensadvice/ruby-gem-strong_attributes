@@ -155,6 +155,84 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
     end
   end
 
+  describe "default" do
+    it "sets fixed default value" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_array_attributes :array, default: [name: "foo"] do
+          attribute :name, :string
+        end
+      end
+
+      expect(test_class.new).to have_attributes(
+        array: match([
+          have_attributes(
+            name: "foo"
+          )
+        ])
+      )
+    end
+
+    it "sets default from proc" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_array_attributes :array, default: -> { [name: "foo"] } do
+          attribute :name, :string
+        end
+      end
+
+      expect(test_class.new).to have_attributes(
+        array: match([
+          have_attributes(
+            name: "foo"
+          )
+        ])
+      )
+    end
+
+    it "sets default from method" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_array_attributes :array, default: :default_value do
+          attribute :name, :string
+        end
+
+        def default_value
+          [name: "foo"]
+        end
+      end
+
+      expect(test_class.new).to have_attributes(
+        array: match([
+          have_attributes(
+            name: "foo"
+          )
+        ])
+      )
+    end
+
+    it "does not call default if value is set" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_array_attributes :array, default: -> { raise "Error" } do
+          attribute :name, :string
+        end
+      end
+
+      expect(test_class.new(array: [name: "bar"])).to have_attributes(
+        array: match([
+          have_attributes(
+            name: "bar"
+          )
+        ])
+      )
+    end
+  end
+
   describe "setting attributes" do
     let(:test_class) do
       Class.new do
