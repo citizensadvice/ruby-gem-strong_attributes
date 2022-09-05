@@ -1,5 +1,10 @@
 # Change log
 
+## v1.1.0
+
+- Added the `prefix` option to the `CopyErrorsValidator`
+- Updated the `copy_errors` argument on nested attributes to pass any options to the CopyErrorsValidator
+
 ## v1.0.0
 
 - No changes

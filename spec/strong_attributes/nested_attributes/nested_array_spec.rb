@@ -496,6 +496,57 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
         expect(test).to be_valid
       end
     end
+
+    context "when copy_errors is true option" do
+      it "validates the nested attributes without allow blank" do
+        test_class = Class.new do
+          include StrongAttributes
+
+          def self.name
+            "Form"
+          end
+
+          nested_array_attributes :array, copy_errors: true do
+            attribute :name, :string
+            attribute :number, :float
+
+            validates :name, :number, presence: true
+          end
+        end
+
+        test = test_class.new
+        expect(test).to be_invalid
+        expect(test.errors.full_messages).to eq [
+          "Array can't be blank"
+        ]
+      end
+    end
+
+    context "when copy_errors has the prefix: false option" do
+      it "validates the nested attributes without a prefix" do
+        test_class = Class.new do
+          include StrongAttributes
+
+          def self.name
+            "Form"
+          end
+
+          nested_array_attributes :object, default: [{}], copy_errors: { prefix: false } do
+            attribute :name, :string
+            attribute :number, :float
+
+            validates :name, :number, presence: true
+          end
+        end
+
+        test = test_class.new
+        expect(test).to be_invalid
+        expect(test.errors.full_messages).to eq [
+          "Name can't be blank",
+          "Number can't be blank"
+        ]
+      end
+    end
   end
 
   describe "attributes_setter" do
