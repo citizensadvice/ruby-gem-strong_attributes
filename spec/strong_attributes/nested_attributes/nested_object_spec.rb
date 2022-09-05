@@ -446,7 +446,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       ]
     end
 
-    context "when copy_errors if false" do
+    context "when copy_errors is false" do
       it "does not validate the nested attributes" do
         test_class = Class.new do
           include StrongAttributes
@@ -465,6 +465,57 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
 
         test = test_class.new
         expect(test).to be_valid
+      end
+    end
+
+    context "when copy_errors is true option" do
+      it "validates the nested attributes without allow blank" do
+        test_class = Class.new do
+          include StrongAttributes
+
+          def self.name
+            "Form"
+          end
+
+          nested_attributes :object, copy_errors: true do
+            attribute :name, :string
+            attribute :number, :float
+
+            validates :name, :number, presence: true
+          end
+        end
+
+        test = test_class.new
+        expect(test).to be_invalid
+        expect(test.errors.full_messages).to eq [
+          "Object can't be blank"
+        ]
+      end
+    end
+
+    context "when copy_errors has the prefix: false option" do
+      it "validates the nested attributes without a prefix" do
+        test_class = Class.new do
+          include StrongAttributes
+
+          def self.name
+            "Form"
+          end
+
+          nested_attributes :object, default: {}, copy_errors: { prefix: false } do
+            attribute :name, :string
+            attribute :number, :float
+
+            validates :name, :number, presence: true
+          end
+        end
+
+        test = test_class.new
+        expect(test).to be_invalid
+        expect(test.errors.full_messages).to eq [
+          "Name can't be blank",
+          "Number can't be blank"
+        ]
       end
     end
 

@@ -1,5 +1,3 @@
-**WARNING: experimental**
-
 # StrongAttributes
 
 Create a [form object](https://dev.to/drbragg/rails-design-patterns-form-object-4d47)
@@ -381,7 +379,7 @@ form.person # => <Person date_of_birth=nil name="Bob">
 - **`allow_destroy`** (`boolean`): if `true` if a `_destroy: true` key is passed then an existing record will be set to `nil`, or `mark_for_destruction`, will be called if the object responds to that method.
 - **`reject_if`** (`proc`): if the proc returns true the update will be rejected/
 - **`replace`** (`boolean`): if `true` an update will replace the existing record rather than merging values in.
-- **`copy_errors`** (`boolean`): if `false` do not copy errors to the model when validating
+- **`copy_errors`** (`boolean` | `object`): settings for copying errors.  Defaults to `allow_blank: true`. See `CopyErrorsValidator`
 - **`attributes_setter`** (`boolean`): if `false` do not create a `name_attributes=` setter.
 
 ## Nested arrays
@@ -523,5 +521,64 @@ form.people # => [<Person name="Frank">]
 - **`reject_if`** (`proc`): If the proc returns true the update will be rejected
 - **`limit`** (`Integer`): If provided, raise a `TooManyRecords` error if the limit is exceeded
 - **`replace`** (`boolean`): if `true` an update will replace the existing record rather than merging values in.
-- **`copy_errors`** (`boolean`): if `false` do not copy errors to the model when validating.
+- **`copy_errors`** (`boolean` | `object`): settings for copying errors.  Defaults to `allow_blank: true`. See `CopyErrorsValidator`
 - **`attributes_setter`** (`boolean`): if `false` do not create a `name_attributes=` setter.
+
+## `CopyErrorsValidator`
+
+This validator will copy errors from a nested model.
+
+By default, it is automatically set when using `nested_array_attributes` or `nested_attributes`
+with the option `allow_blank: true`
+
+```
+class Form
+  include StrongAttributes
+
+  nested_attributes :people, default: {} do # the same as setting `copy_errors: { allow_blank: true }
+    attribute :name, :string
+  end  
+end
+
+form = Form.new()
+form.valid? # => false
+form.errors.full_messages # => ["People name can't be blank"]
+```
+
+It can be customised by passing options as you would with a Rails `EachValidator`.
+
+Setting `copy_errors: false` will not set the validator.
+
+You can also use it on other attributes:
+
+```
+class Form
+  include StrongAttributes
+
+  attr_accessor :model
+
+  validates :model, copy_errors: true
+end
+
+form = Form.new()
+form.valid? # => false
+form.errors.full_messages # => ["Model can't be blank"]
+```
+
+### prefix
+
+If the prefix option is set to false, then nested attribute names will not include the model name.
+
+```
+class Form
+  include StrongAttributes
+
+  nested_attributes :people, default: {}, copy_errors: { prefix: false } do
+    attribute :name, :string
+  end  
+end
+
+form = Form.new()
+form.valid? # => false
+form.errors.full_messages # => ["Name can't be blank"]
+```

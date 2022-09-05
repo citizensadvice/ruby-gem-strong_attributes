@@ -1,5 +1,14 @@
 # Change log
 
+## v1.2.0
+
+- Added the `prefix` option to the `CopyErrorsValidator`
+- Updated the `copy_errors` argument on nested attributes to pass any options to the CopyErrorsValidator
+
+## v1.1.0
+
+- Added a `default` option to `nested_attributes` and `nested_array_attributes`.
+
 ## v1.0.0
 
 - No changes

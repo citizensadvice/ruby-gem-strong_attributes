@@ -8,6 +8,9 @@ module StrongAttributes
   #
   # By default the errors will have the names :"model.attribute", or :"model[0].attribute"
   # This matches how nested attributes errors are named
+  #
+  # Setting the option "prefix: false" will name the errors just using the attribute
+  # `validates :association, copy_errors: { prefix: false }`
   class CopyErrorsValidator < ActiveModel::EachValidator
     def validate_each(record, attribute, values)
       return record.errors.add(attribute, :blank) if values.blank?
@@ -25,6 +28,7 @@ module StrongAttributes
     private
 
     def attribute_name(error, name, index)
+      return error.attribute if options[:prefix] == false
       return "#{name}[#{index}].#{error.attribute}" if index
 
       "#{name}.#{error.attribute}"
