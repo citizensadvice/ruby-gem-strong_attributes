@@ -222,6 +222,8 @@ class Form
   # This is a shortcut for
   # attribute :numbers, StrongAttributes::Type::Array.new(type: :string)
   attribute :numbers, :array, :string
+  # You can also use a positional argument to set the array type
+  # attribute :numbers, :array, type: :string
 end
 
 Form.new({ numbers: %w[one two]).numbers # => ["one", "two"]
