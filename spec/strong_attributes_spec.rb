@@ -119,6 +119,23 @@ RSpec.describe StrongAttributes do
       end
     end
 
+    context "when defined with :array and type keyword argument" do
+      let(:test_class) do
+        Class.new do
+          include StrongAttributes
+          attribute :name, :array, type: ActiveModel::Type::String.new
+        end
+      end
+
+      it "creates an attribute that converts items to an array" do
+        expect(test_class.new(name: "foo").name).to eq ["foo"]
+      end
+
+      it "creates an attribute that saves items as an array" do
+        expect(test_class.new(name: %w[foo bar]).name).to eq %w[foo bar]
+      end
+    end
+
     context "when modified in place" do
       let(:test_class) do
         Class.new do
