@@ -1,5 +1,9 @@
 # Change log
 
+## v1.3.0
+
+- Array attributes now allow a "type" keyword argument instead of a third positional argument
+
 ## v1.2.0
 
 - Added the `prefix` option to the `CopyErrorsValidator`

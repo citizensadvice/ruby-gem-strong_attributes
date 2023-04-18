@@ -35,7 +35,7 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
         self._attribute_default_procs = _attribute_default_procs.merge(name => options.delete(:default))
       end
       if type == :array
-        super(name, Type::Array.new(type: subtype), **options)
+        super(name, Type::Array.new(type: subtype || options.delete(:type)), **options)
       else
         super(name, type, **options)
       end
