@@ -468,7 +468,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
       end
 
       test = test_class.new
-      expect(test).to be_invalid
+      expect(test).not_to be_valid
       expect(test.errors.full_messages).to eq [
         "Array[0] name can't be blank",
         "Array[0] number can't be blank"
@@ -515,7 +515,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
         end
 
         test = test_class.new
-        expect(test).to be_invalid
+        expect(test).not_to be_valid
         expect(test.errors.full_messages).to eq [
           "Array can't be blank"
         ]
@@ -540,7 +540,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
         end
 
         test = test_class.new
-        expect(test).to be_invalid
+        expect(test).not_to be_valid
         expect(test.errors.full_messages).to eq [
           "Name can't be blank",
           "Number can't be blank"
