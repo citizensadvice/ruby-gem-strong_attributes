@@ -69,8 +69,12 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
   #
   # If initialized with a hash, and with keyword arguments, then all keyword arguments will be passed
   # directly to the same named setters
+  #
+  # If initialized with an object responding to `permit!` (eg `ActionController::Parameters`) then `permit!`
+  # will automatically be called
   def initialize(attributes = nil, **kwargs)
     attrs ||= attributes || kwargs
+    attrs = attrs.permit!.to_hash if attrs.respond_to?(:permit!)
     @attributes = _default_attributes.deep_dup
     kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
     _set_initial_values
