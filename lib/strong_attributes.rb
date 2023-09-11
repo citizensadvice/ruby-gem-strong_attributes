@@ -90,6 +90,11 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
   end
   alias attributes= assign_attributes
 
+  # Return only the attributes set by the user
+  def attributes_from_user
+    attributes.select { attribute_came_from_user?(_1) }
+  end
+
   def inspect # :nodoc:
     # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L669
     inspection = if defined?(@attributes) && @attributes

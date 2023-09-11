@@ -238,6 +238,22 @@ end
 Form.new({ numbers: %w[one two]).numbers # => ["one", "two"]
 ```
 
+## Getting only the changed attributes
+
+`attributes_from_user` allows you to just get the attributes provided by the user, and defaults, and not any unset attributes.
+
+```ruby
+class Form
+  include StrongAttributes
+
+  attribute :foo, :string
+  attribute :fizz, :string
+end
+
+# "fizz" attribute is not included as it wasn't set
+Form.new({ foo: "bar" }).attributes_from_user # => { "foo" => "bar" }
+```
+
 ## Nested objects
 
 You can include nested models in the form using `nested_attributes`.
@@ -252,16 +268,16 @@ class Form
   include StrongAttributes
 
   nested_attributes :person do
-  	attribute :name, :string, default: :default_name
-  	attribute :date_of_birth, :date
+    attribute :name, :string, default: :default_name
+    attribute :date_of_birth, :date
 
-  	# This is passed to class_eval, you can add methods and validations here
+    # This is passed to class_eval, you can add methods and validations here
 
-  	validates :name, presence: true
+    validates :name, presence: true
 
-  	def default_name
-     "Frank"
-  	end
+    def default_name
+      "Frank"
+    end
   end
 end
 
@@ -287,7 +303,7 @@ class Form
   include StrongAttributes
 
   nested_attributes :enhanced_person, Person do
-  	 attribute :superpower, :string
+    attribute :superpower, :string
   end
 end
 ```
@@ -301,8 +317,8 @@ class Form
   include StrongAttributes
 
   nested_attributes :person do
-  	attribute :name, :string
-  	attribute :date_of_birth, :date
+    attribute :name, :string
+    attribute :date_of_birth, :date
   end
 end
 
@@ -334,7 +350,7 @@ class Form
   include StrongAttributes
 
   nested_attributes :person, allow_destroy: true do
-  	attribute :name, :string
+    attribute :name, :string
   end
 end
 
@@ -402,8 +418,8 @@ class Form
   include StrongAttributes
 
   nested_array_attributes :people do
-  	attribute :name, :string
-  	attribute :date_of_birth, :date
+    attribute :name, :string
+    attribute :date_of_birth, :date
   end
 end
 
@@ -422,7 +438,7 @@ class Form
   include StrongAttributes
 
   nested_array_attributes :people do
-  	attribute :name, :string
+    attribute :name, :string
   end
 end
 
@@ -449,8 +465,8 @@ class Form
   include StrongAttributes
 
   nested_array_attributes :people do
-  	attribute :id, :integer
-  	attribute :name, :string
+    attribute :id, :integer
+    attribute :name, :string
   end
 end
 
@@ -474,8 +490,8 @@ class Form
   include StrongAttributes
 
   nested_array_attributes :people, allow_destroy: true do
-  	attribute :id, :integer
-  	attribute :name, :string
+    attribute :id, :integer
+    attribute :name, :string
   end
 end
 
@@ -542,7 +558,7 @@ This validator will copy errors from a nested model.
 By default, it is automatically set when using `nested_array_attributes` or `nested_attributes`
 with the option `allow_blank: true`
 
-```
+```ruby
 class Form
   include StrongAttributes
 
@@ -562,7 +578,7 @@ Setting `copy_errors: false` will not set the validator.
 
 You can also use it on other attributes:
 
-```
+```ruby
 class Form
   include StrongAttributes
 
@@ -580,7 +596,7 @@ form.errors.full_messages # => ["Model can't be blank"]
 
 If the prefix option is set to false, then nested attribute names will not include the model name.
 
-```
+```ruby
 class Form
   include StrongAttributes
 

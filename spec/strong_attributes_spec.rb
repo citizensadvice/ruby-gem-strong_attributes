@@ -648,6 +648,21 @@ RSpec.describe StrongAttributes do
     end
   end
 
+  describe "#attributes_from_user" do
+    it "is only the attributes set by the user" do
+      test_class = Class.new do
+        include StrongAttributes
+        attribute :foo, :string
+        attribute :fizz, :string
+        attribute :fox, :string, default: "glove"
+        attribute :reset, :string, default: "value"
+        attribute :array, :array, type: :string
+      end
+
+      expect(test_class.new(foo: "bar", reset: nil).attributes_from_user).to eq("foo" => "bar", "fox" => "glove", "reset" => nil)
+    end
+  end
+
   describe "#as_json" do
     it "serializers to json" do
       test_class = Class.new do
