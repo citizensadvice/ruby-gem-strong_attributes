@@ -65,6 +65,34 @@ RSpec.describe StrongAttributes do
         expect(test_class.new({ "name" => "foo" }).name).to eq "foo"
       end
     end
+
+    context "with strong parameters" do
+      it "sets a known attribute" do
+        test_class = Class.new do
+          include StrongAttributes
+          attribute :name, :string
+        end
+
+        strong_parameters = Class.new do
+          def initialize(hash)
+            @hash = hash
+          end
+
+          def permit!
+            @permitted = true
+            self
+          end
+
+          def to_hash
+            raise "Not permitted!" unless @permitted
+
+            @hash
+          end
+        end
+
+        expect(test_class.new(strong_parameters.new({ "name" => "foo" })).name).to eq "foo"
+      end
+    end
   end
 
   describe "array attributes" do
@@ -617,6 +645,21 @@ RSpec.describe StrongAttributes do
       end
 
       expect(test_class.new(name: "foo").attributes).to eq("name" => "foo")
+    end
+  end
+
+  describe "#attributes_from_user" do
+    it "is only the attributes set by the user" do
+      test_class = Class.new do
+        include StrongAttributes
+        attribute :foo, :string
+        attribute :fizz, :string
+        attribute :fox, :string, default: "glove"
+        attribute :reset, :string, default: "value"
+        attribute :array, :array, type: :string
+      end
+
+      expect(test_class.new(foo: "bar", reset: nil).attributes_from_user).to eq("foo" => "bar", "fox" => "glove", "reset" => nil)
     end
   end
 

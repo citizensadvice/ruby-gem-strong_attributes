@@ -69,8 +69,12 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
   #
   # If initialized with a hash, and with keyword arguments, then all keyword arguments will be passed
   # directly to the same named setters
+  #
+  # If initialized with an object responding to `permit!` (eg `ActionController::Parameters`) then `permit!`
+  # will automatically be called
   def initialize(attributes = nil, **kwargs)
     attrs ||= attributes || kwargs
+    attrs = attrs.permit!.to_hash if attrs.respond_to?(:permit!)
     @attributes = _default_attributes.deep_dup
     kwargs.each { |k, v| __send__(:"#{k}=", v) } if attributes
     _set_initial_values
@@ -85,6 +89,11 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
     super _filter_attributes(attributes)
   end
   alias attributes= assign_attributes
+
+  # Return only the attributes set by the user
+  def attributes_from_user
+    attributes.select { attribute_came_from_user?(_1) }
+  end
 
   def inspect # :nodoc:
     # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L669

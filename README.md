@@ -71,9 +71,18 @@ form = Form.new(string: "foo", number: "1", unknown: "bar")
 form # => <Form string="foo" number=1>
 ```
 
+You can also initialize with `ActionController::Parameters` and these will automatically be marked as permitted.
+
+```
+# { "bar" => { "string" => "foo", "number" => 1 } }
+form = Form.new(params.require(:foo))
+# equivalent of `Form.new(params.require(:foo).permit!.to_hash)`
+form # => <Form string="foo" number=1>
+```
+
 ### Initializing with non-user values
 
-It is useful to initialize a form with non-user input.  For example you
+It is useful to initialize a form with non-user input. For example you
 might want to pass in model loaded by the controller, but not allow potentially unsafe user input to set this value.
 
 If the object is initialized with a hash, and keyword arguments, any keyword arguments passed to the constructor will be passed directly to setters on the model.
@@ -103,7 +112,7 @@ Form.new({}, safe_from_user: "foo").safe_from_user # => "foo"
 
 ### Safe setters
 
-It is possible to mark a setter as "safe".  It will then by initialized with user provided values.
+It is possible to mark a setter as "safe". It will then by initialized with user provided values.
 
 ```ruby
 class Form
@@ -127,8 +136,8 @@ class Form
   include StrongAttributes
 
   attribute :name, :string
-  
-  validates :name, presence: true 
+
+  validates :name, presence: true
 end
 
 form = Form.new
@@ -164,9 +173,9 @@ class Form
   include StrongAttributes
 
   attribute :message, :string, default: :default_message
-    
+
   private
-  
+
   def default_message
     "Hello world!"
   end
@@ -186,7 +195,7 @@ class Form
   include StrongAttributes
 
   attribute :postcode, :string
-  
+
   def postcode=(value)
     super value&.upcase
   end
@@ -229,6 +238,22 @@ end
 Form.new({ numbers: %w[one two]).numbers # => ["one", "two"]
 ```
 
+## Getting only the changed attributes
+
+`attributes_from_user` allows you to just get the attributes provided by the user, and defaults, and not any unset attributes.
+
+```ruby
+class Form
+  include StrongAttributes
+
+  attribute :foo, :string
+  attribute :fizz, :string
+end
+
+# "fizz" attribute is not included as it wasn't set
+Form.new({ foo: "bar" }).attributes_from_user # => { "foo" => "bar" }
+```
+
 ## Nested objects
 
 You can include nested models in the form using `nested_attributes`.
@@ -243,17 +268,17 @@ class Form
   include StrongAttributes
 
   nested_attributes :person do
-  	attribute :name, :string, default: :default_name
-  	attribute :date_of_birth, :date
-  	
-  	# This is passed to class_eval, you can add methods and validations here
-  	
-  	validates :name, presence: true
-  	
-  	def default_name
-     "Frank"
-  	end
-  end  
+    attribute :name, :string, default: :default_name
+    attribute :date_of_birth, :date
+
+    # This is passed to class_eval, you can add methods and validations here
+
+    validates :name, presence: true
+
+    def default_name
+      "Frank"
+    end
+  end
 end
 
 Form.new({ person: { name: "Bob" } }).person # => <Person name="Bob" age=nil>
@@ -261,7 +286,7 @@ Form.new({ person: { name: "Bob" } }).person # => <Person name="Bob" age=nil>
 # Using a class
 class Person
   include StrongAttributes
-  
+
   attribute :name, :string
   attribute :date_of_birth, :date
 end
@@ -270,7 +295,7 @@ class Form
   include StrongAttributes
 
   # Can be a String, or the class
-  nested_attributes :person, "Person" 
+  nested_attributes :person, "Person"
 end
 
 # Defining the super class for an inline definition
@@ -278,23 +303,23 @@ class Form
   include StrongAttributes
 
   nested_attributes :enhanced_person, Person do
-  	 attribute :superpower, :string
-  end  
+    attribute :superpower, :string
+  end
 end
 ```
 
 ### Updating nested attributes
 
-A setter is created for the nested attributes.  Updates to the will merge in the new values, unless the `replace` option is set to `true`
+A setter is created for the nested attributes. Updates to the will merge in the new values, unless the `replace` option is set to `true`
 
 ```ruby
 class Form
   include StrongAttributes
 
   nested_attributes :person do
-  	attribute :name, :string
-  	attribute :date_of_birth, :date
-  end  
+    attribute :name, :string
+    attribute :date_of_birth, :date
+  end
 end
 
 form = Form.new({ person: { name: "Bob" } })
@@ -302,7 +327,7 @@ form.person = { date_of_birth: "1980-01-01" }
 form.person # => <Person date_of_birth=1980-01-01 name="Bob">
 ```
 
-A `name_attributes=` setter is also created.  This allows better compatibility with the Rails helper `fields_for`, which is hard coded to look for the a `name_attributes=` setter.
+A `name_attributes=` setter is also created. This allows better compatibility with the Rails helper `fields_for`, which is hard coded to look for the a `name_attributes=` setter.
 
 ```ruby
 form = Form.new({ person: { name: "Bob" } })
@@ -325,8 +350,8 @@ class Form
   include StrongAttributes
 
   nested_attributes :person, allow_destroy: true do
-  	attribute :name, :string
-  end  
+    attribute :name, :string
+  end
 end
 
 form = Form.new({ person: { name: "Bob" } })
@@ -347,7 +372,7 @@ class Form
   nested_attributes :person, initial_value: -> { { name: "Bob" } } do
     attribute :name, :string
     attribute :date_of_birth, :date
-  end  
+  end
 end
 
 form = Form.new(person: { date_of_birth: "1980-01-01" } })
@@ -367,7 +392,7 @@ class Form
   nested_attributes :person, default: -> { { name: "Bob" } } do
     attribute :name, :string
     attribute :date_of_birth, :date
-  end  
+  end
 end
 
 form = Form.new
@@ -381,21 +406,21 @@ form.person # => <Person date_of_birth=nil name="Bob">
 - **`allow_destroy`** (`boolean`): if `true` if a `_destroy: true` key is passed then an existing record will be set to `nil`, or `mark_for_destruction`, will be called if the object responds to that method.
 - **`reject_if`** (`proc`): if the proc returns true the update will be rejected/
 - **`replace`** (`boolean`): if `true` an update will replace the existing record rather than merging values in.
-- **`copy_errors`** (`boolean` | `object`): settings for copying errors.  Defaults to `allow_blank: true`. See `CopyErrorsValidator`
+- **`copy_errors`** (`boolean` | `object`): settings for copying errors. Defaults to `allow_blank: true`. See `CopyErrorsValidator`
 - **`attributes_setter`** (`boolean`): if `false` do not create a `name_attributes=` setter.
 
 ## Nested arrays
 
-Nested attributes also support arrays.  These are designed to work like ActiveRecord nested attributes for `has_many` records.
+Nested attributes also support arrays. These are designed to work like ActiveRecord nested attributes for `has_many` records.
 
 ```ruby
 class Form
   include StrongAttributes
 
   nested_array_attributes :people do
-  	attribute :name, :string
-  	attribute :date_of_birth, :date
-  end  
+    attribute :name, :string
+    attribute :date_of_birth, :date
+  end
 end
 
 form = Form.new({ people: [{ name: "Bob" }, { name: "Harry" }] })
@@ -406,15 +431,15 @@ form.people # => [<Person name="Bob">, <Person name="Harry">]
 
 Updates to nested array attributes work like ActiveRecord nested attributes.
 
-The updates can either be an array or hash.  If it is a hash only the values are used.
+The updates can either be an array or hash. If it is a hash only the values are used.
 
 ```ruby
 class Form
   include StrongAttributes
 
   nested_array_attributes :people do
-  	attribute :name, :string
-  end  
+    attribute :name, :string
+  end
 end
 
 # You can update using an array
@@ -433,16 +458,16 @@ form.people = [name: "Harry"]
 form.people # => [<Person name="Bob">, <Person name="Harry">]
 ```
 
-If an `id` attribute is present it will update the record with the same id.  It supports using `primary_key` to customise this id.
+If an `id` attribute is present it will update the record with the same id. It supports using `primary_key` to customise this id.
 
 ```ruby
 class Form
   include StrongAttributes
 
   nested_array_attributes :people do
-  	attribute :id, :integer
-  	attribute :name, :string
-  end  
+    attribute :id, :integer
+    attribute :name, :string
+  end
 end
 
 form = Form.new(people: [id: 1, name: "Bob"])
@@ -450,7 +475,7 @@ form.people = [id: 1, name: "Harry"]
 form.people # => [<Person id=1 name="Harry">]
 ```
 
-An `name_attributes=` setter is also created.  This allows better compatibility with the Rails helper `fields_for`, which is hard coded to look for the a `name_attributes=` setter.
+An `name_attributes=` setter is also created. This allows better compatibility with the Rails helper `fields_for`, which is hard coded to look for the a `name_attributes=` setter.
 
 ```ruby
 form = Form.new({ people: [name: "Bob"] })
@@ -465,9 +490,9 @@ class Form
   include StrongAttributes
 
   nested_array_attributes :people, allow_destroy: true do
-  	attribute :id, :integer
-  	attribute :name, :string
-  end  
+    attribute :id, :integer
+    attribute :name, :string
+  end
 end
 
 form = Form.new(people: [{ id: 1, name: "Bob" }, { id: 2, name: "Harry }])
@@ -488,7 +513,7 @@ class Form
   nested_array_attributes :people, initial_value: -> { [name: "Frank"] } do
     attribute :name, :string
     attribute :date_of_birth, :date
-  end  
+  end
 end
 
 form = Form.new({ people: [name: "Bob"] })
@@ -508,7 +533,7 @@ class Form
   nested_array_attributes :people, default: -> { [name: "Frank"] } do
     attribute :name, :string
     attribute :date_of_birth, :date
-  end  
+  end
 end
 
 form = Form.new()
@@ -523,7 +548,7 @@ form.people # => [<Person name="Frank">]
 - **`reject_if`** (`proc`): If the proc returns true the update will be rejected
 - **`limit`** (`Integer`): If provided, raise a `TooManyRecords` error if the limit is exceeded
 - **`replace`** (`boolean`): if `true` an update will replace the existing record rather than merging values in.
-- **`copy_errors`** (`boolean` | `object`): settings for copying errors.  Defaults to `allow_blank: true`. See `CopyErrorsValidator`
+- **`copy_errors`** (`boolean` | `object`): settings for copying errors. Defaults to `allow_blank: true`. See `CopyErrorsValidator`
 - **`attributes_setter`** (`boolean`): if `false` do not create a `name_attributes=` setter.
 
 ## `CopyErrorsValidator`
@@ -533,13 +558,13 @@ This validator will copy errors from a nested model.
 By default, it is automatically set when using `nested_array_attributes` or `nested_attributes`
 with the option `allow_blank: true`
 
-```
+```ruby
 class Form
   include StrongAttributes
 
   nested_attributes :people, default: {} do # the same as setting `copy_errors: { allow_blank: true }
     attribute :name, :string
-  end  
+  end
 end
 
 form = Form.new()
@@ -553,7 +578,7 @@ Setting `copy_errors: false` will not set the validator.
 
 You can also use it on other attributes:
 
-```
+```ruby
 class Form
   include StrongAttributes
 
@@ -571,13 +596,13 @@ form.errors.full_messages # => ["Model can't be blank"]
 
 If the prefix option is set to false, then nested attribute names will not include the model name.
 
-```
+```ruby
 class Form
   include StrongAttributes
 
   nested_attributes :people, default: {}, copy_errors: { prefix: false } do
     attribute :name, :string
-  end  
+  end
 end
 
 form = Form.new()

@@ -439,7 +439,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
       end
 
       test = test_class.new
-      expect(test).to be_invalid
+      expect(test).not_to be_valid
       expect(test.errors.full_messages).to eq [
         "Object name can't be blank",
         "Object number can't be blank"
@@ -486,7 +486,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
         end
 
         test = test_class.new
-        expect(test).to be_invalid
+        expect(test).not_to be_valid
         expect(test.errors.full_messages).to eq [
           "Object can't be blank"
         ]
@@ -511,7 +511,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
         end
 
         test = test_class.new
-        expect(test).to be_invalid
+        expect(test).not_to be_valid
         expect(test.errors.full_messages).to eq [
           "Name can't be blank",
           "Number can't be blank"

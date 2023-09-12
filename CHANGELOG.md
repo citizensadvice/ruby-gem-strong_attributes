@@ -1,5 +1,10 @@
 # Change log
 
+## v1.4.0
+
+- If an `ActionController::Parameters` is passed as parameters these will automatically marked as permitted
+- Added `attributes_from_user` method to return only the changed attributes
+
 ## v1.3.0
 
 - Array attributes now allow a "type" keyword argument instead of a third positional argument

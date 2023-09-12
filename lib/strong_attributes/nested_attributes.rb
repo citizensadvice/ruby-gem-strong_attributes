@@ -37,8 +37,8 @@ module StrongAttributes
       # - refject_if - proc - reject the update if this returns true
       # - replace - defaults to `false` - if true, replace the object instead of merging the values in
       #
-      def nested_attributes(name, form = nil, **options, &block)
-        _define_nested_attributes(name, NestedObject, form, **options, &block)
+      def nested_attributes(name, ...)
+        _define_nested_attributes(name, NestedObject, ...)
       end
 
       # Define a nested array of form objects
@@ -70,8 +70,8 @@ module StrongAttributes
       # - replace - defaults to `false` - if true, replace the array instead of merging the values in
       # - limit - integer - if set, raise TooManyRecords, if the updates exceed this limit
       #
-      def nested_array_attributes(name, form = nil, **options, &block)
-        _define_nested_attributes(name, NestedArray, form, **options, &block)
+      def nested_array_attributes(name, ...)
+        _define_nested_attributes(name, NestedArray, ...)
       end
 
       private
