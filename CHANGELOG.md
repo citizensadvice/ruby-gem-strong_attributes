@@ -1,5 +1,9 @@
 # Change log
 
+## Unreleased
+
+- Remove support for Ruby 3.0
+
 ## v1.4.0
 
 - If an `ActionController::Parameters` is passed as parameters these will automatically marked as permitted

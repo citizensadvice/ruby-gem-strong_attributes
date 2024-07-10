@@ -2,12 +2,12 @@
 
 module StrongAttributes
   module Helpers # :nodoc:
-    def self.create_anonymous_form(name, parent_name, base_class, &block)
+    def self.create_anonymous_form(name, parent_name, base_class, &)
       form = Class.new(base_class || Object)
       form.include StrongAttributes unless base_class&.include?(StrongAttributes)
       # Validation needs a name
       form.define_singleton_method(:name) { "#{parent_name}#{name&.to_s&.classify&.singularize}" }
-      form.class_eval(&block)
+      form.class_eval(&)
       form
     end
 

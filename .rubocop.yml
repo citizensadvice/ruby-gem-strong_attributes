@@ -5,7 +5,7 @@ inherit_gem:
 require: rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 3
+  TargetRubyVersion: 3.1
 
 RSpec/ExampleLength:
   Enabled: false

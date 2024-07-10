@@ -86,7 +86,7 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
   #
   # Only attributes, and safe setters will be assigned to
   def assign_attributes(attributes)
-    super _filter_attributes(attributes)
+    super(_filter_attributes(attributes))
   end
   alias attributes= assign_attributes
 
@@ -98,9 +98,9 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
   def inspect # :nodoc:
     # based on https://github.com/rails/rails/blob/v6.1.1/activerecord/lib/active_record/core.rb#L669
     inspection = if defined?(@attributes) && @attributes
-                   self.class.attribute_names.collect do |name|
-                     "#{name}: #{attribute_for_inspect(name)}"
-                   end.compact.join(", ")
+                   self.class.attribute_names.filter_map do |name|
+                     "#{name}: #{attribute_for_inspect(name)}" if @attributes.key?(name)
+                   end.join(", ")
                  else
                    "not initialized"
                  end
@@ -132,7 +132,7 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
       if @attributes.key?(name.to_s)
         @attributes.write_from_database(name.to_s, value)
       else
-        public_send("#{name}=", value)
+        public_send(:"#{name}=", value)
       end
     end
   end
@@ -145,7 +145,7 @@ module StrongAttributes # rubocop:disable Metrics/ModuleLength
       if @attributes.key?(name.to_s)
         @attributes.write_from_database(name.to_s, value)
       else
-        public_send("#{name}=", value)
+        public_send(:"#{name}=", value)
       end
     end
   end

@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.files = Dir["lib/**/*.rb"]
   s.authors = ["Daniel Lewis"]
   s.license = "ISC"
-  s.required_ruby_version = ">= 3.0.0"
+  s.required_ruby_version = ">= 3.1"
   s.metadata["rubygems_mfa_required"] = "true"
 
-  s.add_runtime_dependency "activemodel", ">= 6.1.0"
+  s.add_dependency "activemodel", ">= 6.1.0"
 end
