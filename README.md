@@ -202,6 +202,20 @@ class Form
 end
 ```
 
+## Normalization
+
+You can define normalization functions like in Rails
+
+```ruby
+class Form
+  include StrongAttributes
+
+  normalizes :postcode, with: ->(value) { FormatPostcode.format(value) }
+
+  attribute :postcode, :string
+end
+```
+
 ## Custom attributes
 
 You can create your own custom attributes using ActiveModel attributes.

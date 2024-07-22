@@ -76,16 +76,6 @@ module StrongAttributes
 
       private
 
-      def _nested_methods
-        # A module to hold the setter methods
-        # This will allow them to be overridden by the user and for the user to call super
-        @_nested_methods ||= begin
-          m = Module.new
-          include m
-          m
-        end
-      end
-
       def _define_nested_attributes(name, type, form = nil, initial_value: nil, default: nil, copy_errors: { allow_blank: true }, attributes_setter: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists, Layout/LineLength
         form = form.constantize if form.is_a? String
         form = Helpers.create_anonymous_form(name, self.name, form, &block) if block
@@ -95,7 +85,7 @@ module StrongAttributes
         self._attribute_initial_procs = _attribute_initial_procs.merge(name => initial_value) if initial_value
         self._attribute_default_procs = _attribute_default_procs.merge(name => default) if default
         store = :"_nested_attribute_#{name}"
-        _nested_methods.module_eval do
+        _overrideable_methods do
           define_method store do
             nested_attributes_store[name] ||= type.new(form, **options)
           end
