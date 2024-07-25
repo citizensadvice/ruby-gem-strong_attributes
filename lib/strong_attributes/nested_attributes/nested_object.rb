@@ -5,14 +5,15 @@ module StrongAttributes
     class NestedObject
       attr_reader :value
 
-      def initialize(form, allow_destroy: false, reject_if: nil, replace: false)
+      def initialize(form, name, allow_destroy: false, reject_if: nil, replace: false)
         @form = form
+        @name = name
         @allow_destroy = allow_destroy
         @reject_if = reject_if
         @replace = replace
       end
 
-      def assign_value(value, context)
+      def assign_value(value, context, initialize_with)
         case value
         when nil, @form
           @value = value
@@ -33,9 +34,17 @@ module StrongAttributes
             @value.assign_attributes(value)
           else
             # Not initialized, so create a new item
-            @value = @form.new(value)
+            @value = @form.new(value, **initalize_options(context, initialize_with))
           end
         end
+      end
+
+      private
+
+      def initalize_options(context, initialize_with)
+        return {} unless initialize_with
+
+        Helpers.default_value(@name, initialize_with, context) || {}
       end
     end
   end

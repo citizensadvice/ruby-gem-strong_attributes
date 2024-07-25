@@ -421,6 +421,32 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedObject do
     end
   end
 
+  describe "initialize_with" do
+    it "allows kwargs to be sent to the class on initialization using a symbol" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        nested_attributes :object, initialize_with: :setup do
+          attr_accessor :foo
+
+          attribute :name, :string
+        end
+
+        def setup
+          { foo: "bar" }
+        end
+      end
+
+      test = test_class.new(object: { name: "fizz" })
+      expect(test).to have_attributes(
+        object: have_attributes(
+          name: "fizz",
+          foo: "bar"
+        )
+      )
+    end
+  end
+
   describe "validation" do
     it "validates the nested attributes" do
       test_class = Class.new do

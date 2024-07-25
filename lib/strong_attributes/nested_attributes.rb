@@ -76,7 +76,18 @@ module StrongAttributes
 
       private
 
-      def _define_nested_attributes(name, type, form = nil, initial_value: nil, default: nil, copy_errors: { allow_blank: true }, attributes_setter: true, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists, Layout/LineLength
+      def _define_nested_attributes( # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
+        name,
+        type,
+        form = nil,
+        initial_value: nil,
+        initialize_with: nil,
+        default: nil,
+        copy_errors: { allow_blank: true },
+        attributes_setter: true,
+        **options,
+        &block
+      )
         form = form.constantize if form.is_a? String
         form = Helpers.create_anonymous_form(name, self.name, form, &block) if block
         safe_setter name
@@ -87,14 +98,14 @@ module StrongAttributes
         store = :"_nested_attribute_#{name}"
         _overrideable_methods do
           define_method store do
-            nested_attributes_store[name] ||= type.new(form, **options)
+            nested_attributes_store[name] ||= type.new(form, name, **options)
           end
           private store
           define_method name do
             send(store).value
           end
           define_method :"#{name}=" do |value|
-            send(store).assign_value(value, self)
+            send(store).assign_value(value, self, initialize_with)
           end
           alias_method :"#{name}_attributes=", :"#{name}=" if attributes_setter
         end

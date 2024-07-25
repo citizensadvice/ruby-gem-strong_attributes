@@ -7,15 +7,16 @@ module StrongAttributes
     class NestedArray
       attr_reader :value
 
-      def initialize(form, allow_destroy: false, limit: nil, reject_if: nil, replace: false)
+      def initialize(form, name, allow_destroy: false, limit: nil, reject_if: nil, replace: false)
         @form = form
+        @name = name
         @allow_destroy = allow_destroy
         @limit = limit
         @reject_if = reject_if
         @replace = replace
       end
 
-      def assign_value(values, context)
+      def assign_value(values, context, initialize_with)
         if values.nil?
           @value = values
         else
@@ -28,18 +29,18 @@ module StrongAttributes
           else
             @value ||= []
           end
-          values.each { |item| set_item(item, context) }
+          values.each { |item| set_item(item, context, initialize_with) }
         end
       end
 
       private
 
-      def set_item(item, context)
+      def set_item(item, context, initialize_with)
         case item
         when @form
           @value << item
         when Hash
-          set_attributes(item, context)
+          set_attributes(item, context, initialize_with)
         end
       end
 
@@ -52,7 +53,7 @@ module StrongAttributes
         @value.find { |i| i.try(id_key)&.to_s == value[id_key].to_s } if id_key && value[id_key].present?
       end
 
-      def set_attributes(item, context)
+      def set_attributes(item, context, initialize_with) # /*
         item = item.with_indifferent_access
         found = find_from_id(item)
         destroy = @allow_destroy && Helpers.destroy_flag?(item["_destroy"])
@@ -65,8 +66,14 @@ module StrongAttributes
           found.assign_attributes(item)
         elsif !destroy
           # Add to array
-          @value << @form.new(item)
+          @value << @form.new(item, **initalize_options(context, initialize_with))
         end
+      end
+
+      def initalize_options(context, initialize_with)
+        return {} unless initialize_with
+
+        Helpers.default_value(@name, initialize_with, context) || {}
       end
     end
   end
