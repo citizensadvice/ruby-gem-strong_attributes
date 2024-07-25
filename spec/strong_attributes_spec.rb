@@ -778,6 +778,102 @@ RSpec.describe StrongAttributes do
     end
   end
 
+  describe "normalization" do
+    it "normalizes from create" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        normalizes :name, with: lambda(&:titlecase)
+
+        attribute :name, :string
+      end
+
+      expect(test_class.new(name: "foo bar").name).to eq "Foo Bar"
+    end
+
+    it "normalizes from update" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        normalizes :name, with: lambda(&:titlecase)
+
+        attribute :name, :string
+      end
+
+      test = test_class.new(name: "")
+      test.name = "foo bar"
+
+      expect(test.name).to eq "Foo Bar"
+    end
+
+    it "normalizes from assignment" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        normalizes :name, with: lambda(&:titlecase)
+
+        attribute :name, :string
+      end
+
+      test = test_class.new(name: "")
+      test.attributes = { name: "foo bar" }
+
+      expect(test.name).to eq "Foo Bar"
+    end
+
+    it "ignores nil by default" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        normalizes :name, with: ->(_) { "replaced" }
+
+        attribute :name, :string
+      end
+
+      expect(test_class.new(name: nil).name).to be_nil
+    end
+
+    it "normalizes nil is apply_to_nil" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        normalizes :name, with: ->(_) { "replaced" }, apply_to_nil: true
+
+        attribute :name, :string
+      end
+
+      expect(test_class.new(name: nil).name).to eq "replaced"
+    end
+
+    it "does not normalize initial values" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        normalizes :name, with: ->(_) { "replaced" }, apply_to_nil: true
+
+        attribute :name, :string, default: "foo"
+      end
+
+      expect(test_class.new.name).to eq "foo"
+    end
+
+    it "allows overrider of setter" do
+      test_class = Class.new do
+        include StrongAttributes
+
+        normalizes :name, with: lambda(&:titlecase)
+
+        attribute :name, :string
+
+        def name=(value)
+          super("#{value} fee")
+        end
+      end
+
+      expect(test_class.new(name: "foo bar").name).to eq "Foo Bar Fee"
+    end
+  end
+
   describe ".inspect" do
     let(:test_class) do
       Class.new do

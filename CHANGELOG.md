@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Remove support for Ruby 3.0
+- Add normalization
 
 ## v1.4.0
 

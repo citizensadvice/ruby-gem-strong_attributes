@@ -5,16 +5,20 @@ require "active_support"
 require "strong_attributes/version"
 require "strong_attributes/helpers"
 require "strong_attributes/nested_attributes"
+require "strong_attributes/normalization"
+require "strong_attributes/overrideable_methods"
 require "strong_attributes/type/array"
 
 module StrongAttributes # rubocop:disable Metrics/ModuleLength
   extend ActiveSupport::Concern
 
+  include OverridableMethods
   include ActiveModel::Model
   include ActiveModel::Attributes
   include ActiveModel::Serializers::JSON
   include ActiveModel::Dirty
   include NestedAttributes
+  include Normalization
 
   class_methods do
     # Add an attribute to the modal
