@@ -11,6 +11,7 @@ module StrongAttributes
         @_overrideable_methods ||= begin
           m = Module.new
           include m
+
           m
         end
 

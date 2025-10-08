@@ -401,7 +401,7 @@ RSpec.describe StrongAttributes::NestedAttributes::NestedArray do
             attribute :id, :integer
             attribute :name, :string
 
-            def self.primary_key
+            def self.primary_key # rubocop:disable Naming/PredicateMethod
               false
             end
           end

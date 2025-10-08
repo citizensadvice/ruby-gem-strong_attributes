@@ -6,6 +6,7 @@ RSpec.describe StrongAttributes do
       it "sets a known attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string
         end
 
@@ -15,6 +16,7 @@ RSpec.describe StrongAttributes do
       it "sets dirty" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string
         end
 
@@ -24,6 +26,7 @@ RSpec.describe StrongAttributes do
       it "does not set an unknown attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attr_accessor :unknown
 
           attribute :name, :string
@@ -37,6 +40,7 @@ RSpec.describe StrongAttributes do
       it "sets a known attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string
         end
 
@@ -46,6 +50,7 @@ RSpec.describe StrongAttributes do
       it "does not set an unknown attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attr_accessor :unknown
 
           attribute :name, :string
@@ -59,6 +64,7 @@ RSpec.describe StrongAttributes do
       it "sets a known attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string
         end
 
@@ -70,6 +76,7 @@ RSpec.describe StrongAttributes do
       it "sets a known attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string
         end
 
@@ -100,6 +107,7 @@ RSpec.describe StrongAttributes do
       let(:test_class) do
         Class.new do
           include StrongAttributes
+
           attribute :name, StrongAttributes::Type::Array.new(type: :string)
         end
       end
@@ -117,6 +125,7 @@ RSpec.describe StrongAttributes do
       let(:test_class) do
         Class.new do
           include StrongAttributes
+
           attribute :name, :array, :string
         end
       end
@@ -134,6 +143,7 @@ RSpec.describe StrongAttributes do
       let(:test_class) do
         Class.new do
           include StrongAttributes
+
           attribute :name, :array, ActiveModel::Type::String.new
         end
       end
@@ -151,6 +161,7 @@ RSpec.describe StrongAttributes do
       let(:test_class) do
         Class.new do
           include StrongAttributes
+
           attribute :name, :array, type: ActiveModel::Type::String.new
         end
       end
@@ -168,6 +179,7 @@ RSpec.describe StrongAttributes do
       let(:test_class) do
         Class.new do
           include StrongAttributes
+
           attribute :name, :array, :string
         end
       end
@@ -185,6 +197,7 @@ RSpec.describe StrongAttributes do
       it "does not call setters" do
         test_class = Class.new do
           include StrongAttributes
+
           attr_accessor :unsafe
         end
 
@@ -196,6 +209,7 @@ RSpec.describe StrongAttributes do
       it "does not call setters" do
         test_class = Class.new do
           include StrongAttributes
+
           attr_accessor :unsafe
         end
 
@@ -207,6 +221,7 @@ RSpec.describe StrongAttributes do
       it "calls setters" do
         test_class = Class.new do
           include StrongAttributes
+
           attr_accessor :unsafe
         end
 
@@ -231,6 +246,7 @@ RSpec.describe StrongAttributes do
     it "calls allowed setters" do
       test_class = Class.new do
         include StrongAttributes
+
         attr_accessor :safe
         attr_accessor :other_safe
         attr_accessor :unsafe
@@ -283,6 +299,7 @@ RSpec.describe StrongAttributes do
       it "uses the default by default" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: "foo"
         end
 
@@ -292,6 +309,7 @@ RSpec.describe StrongAttributes do
       it "allows the default to be overridden" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: "foo"
         end
 
@@ -301,6 +319,7 @@ RSpec.describe StrongAttributes do
       it "does not set dirty" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: "foo"
         end
 
@@ -310,6 +329,7 @@ RSpec.describe StrongAttributes do
       it "does set dirty if overridden" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: "foo"
         end
 
@@ -321,6 +341,7 @@ RSpec.describe StrongAttributes do
       it "uses a default with no airity" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: -> { default_value }
 
           def default_value
@@ -334,6 +355,7 @@ RSpec.describe StrongAttributes do
       it "uses a default with airity" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: -> { default_value }
 
           def default_value
@@ -347,6 +369,7 @@ RSpec.describe StrongAttributes do
       it "does not set dirty" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: -> { "foo" }
         end
 
@@ -356,6 +379,7 @@ RSpec.describe StrongAttributes do
       it "allows the default to be overridden" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: -> { "foo" }
         end
 
@@ -365,6 +389,7 @@ RSpec.describe StrongAttributes do
       it "does set dirty if overridden" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: -> { "foo" }
         end
 
@@ -374,6 +399,7 @@ RSpec.describe StrongAttributes do
       it "allows defaults to be based on previous attributes" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :hello, :string
           attribute :name, :string, default: -> { "#{hello} World!" }
         end
@@ -386,6 +412,7 @@ RSpec.describe StrongAttributes do
       it "uses a default method" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: :default_value
 
           def default_value
@@ -399,6 +426,7 @@ RSpec.describe StrongAttributes do
       it "does not set dirty" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: :default_value
 
           def default_value
@@ -412,6 +440,7 @@ RSpec.describe StrongAttributes do
       it "allows the default to be overridden" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: :default_value
 
           def default_value
@@ -425,6 +454,7 @@ RSpec.describe StrongAttributes do
       it "does set dirty if overridden" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string, default: :default_value
 
           def default_value
@@ -438,6 +468,7 @@ RSpec.describe StrongAttributes do
       it "allows defaults to be based on previous attributes" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :hello, :string
           attribute :name, :string, default: :default_value
 
@@ -456,6 +487,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name
         end
 
@@ -467,6 +499,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :string
         end
 
@@ -478,6 +511,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :integer
         end
 
@@ -489,6 +523,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :boolean
         end
 
@@ -500,6 +535,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :date
         end
 
@@ -511,6 +547,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :datetime
         end
 
@@ -522,6 +559,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :decimal
         end
 
@@ -533,6 +571,7 @@ RSpec.describe StrongAttributes do
       it "sets the attribute" do
         test_class = Class.new do
           include StrongAttributes
+
           attribute :name, :float
         end
 
@@ -545,6 +584,7 @@ RSpec.describe StrongAttributes do
     it "sets attributes using a string key" do
       test_class = Class.new do
         include StrongAttributes
+
         attribute :name, :string
       end
 
@@ -556,6 +596,7 @@ RSpec.describe StrongAttributes do
     it "sets attributes using a symbol key" do
       test_class = Class.new do
         include StrongAttributes
+
         attribute :name, :string
       end
 
@@ -567,6 +608,7 @@ RSpec.describe StrongAttributes do
     it "does not set unknown attributes" do
       test_class = Class.new do
         include StrongAttributes
+
         attr_accessor :unsafe
       end
 
@@ -578,6 +620,7 @@ RSpec.describe StrongAttributes do
     it "assigns to safe setters" do
       test_class = Class.new do
         include StrongAttributes
+
         attr_accessor :safe
 
         safe_setter :safe
@@ -593,6 +636,7 @@ RSpec.describe StrongAttributes do
     it "sets attributes using a string key" do
       test_class = Class.new do
         include StrongAttributes
+
         attribute :name, :string
       end
 
@@ -604,6 +648,7 @@ RSpec.describe StrongAttributes do
     it "sets attributes using a symbol key" do
       test_class = Class.new do
         include StrongAttributes
+
         attribute :name, :string
       end
 
@@ -615,6 +660,7 @@ RSpec.describe StrongAttributes do
     it "does not set unknown attributes" do
       test_class = Class.new do
         include StrongAttributes
+
         attr_accessor :unsafe
       end
 
@@ -626,6 +672,7 @@ RSpec.describe StrongAttributes do
     it "assigns to safe setters" do
       test_class = Class.new do
         include StrongAttributes
+
         attr_accessor :safe
 
         safe_setter :safe
@@ -641,6 +688,7 @@ RSpec.describe StrongAttributes do
     it "is the attributes" do
       test_class = Class.new do
         include StrongAttributes
+
         attribute :name, :string
       end
 
@@ -652,6 +700,7 @@ RSpec.describe StrongAttributes do
     it "is only the attributes set by the user" do
       test_class = Class.new do
         include StrongAttributes
+
         attribute :foo, :string
         attribute :fizz, :string
         attribute :fox, :string, default: "glove"
@@ -667,6 +716,7 @@ RSpec.describe StrongAttributes do
     it "serializers to json" do
       test_class = Class.new do
         include StrongAttributes
+
         attr_accessor :nested
 
         safe_setter :nested
