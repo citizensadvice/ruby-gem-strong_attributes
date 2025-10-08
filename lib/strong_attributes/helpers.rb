@@ -6,7 +6,7 @@ module StrongAttributes
       form = Class.new(base_class || Object)
       form.include StrongAttributes unless base_class&.include?(StrongAttributes)
       # Validation needs a name
-      form.define_singleton_method(:name) { "#{parent_name}#{name&.to_s&.classify&.singularize}" }
+      form.define_singleton_method(:name) { "#{parent_name}#{name.to_s.classify.singularize}" }
       form.class_eval(&)
       form
     end
