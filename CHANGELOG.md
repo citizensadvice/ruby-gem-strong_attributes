@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Remove support for Ruby 3.0
+- Remove support for Ruby 3.1
+- Require Rails Active Model > 7.2
 - Add normalization
 
 ## v1.4.0

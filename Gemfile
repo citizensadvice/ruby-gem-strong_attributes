@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source "https://rubygems.org"
-gem "citizens-advice-style", git: "https://github.com/citizensadvice/citizens-advice-style-ruby", tag: "v11.0.0"
+gem "citizens-advice-style", git: "https://github.com/citizensadvice/citizens-advice-style-ruby", tag: "v12.1.0"
 
 group :development, :test do
   gem "debug"

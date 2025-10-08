@@ -1,11 +1,10 @@
 inherit_gem:
   citizens-advice-style:
     - default.yml
-
-require: rubocop-rspec
+    - default-rails.yml
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
 
 RSpec/ExampleLength:
   Enabled: false
