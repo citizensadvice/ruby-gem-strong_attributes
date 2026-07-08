@@ -2,21 +2,31 @@ version: 2
 updates:
   # GitHub Actions
   - package-ecosystem: 'github-actions'
-    rebase-strategy: disabled
     directory: '/'
     schedule:
-      interval: weekly
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      # Group everything except major version updates
+      # and security vulnerabilities together
+      regular-updates:
+        update-types:
+          - 'minor'
+          - 'patch'
 
   # Docker
   - package-ecosystem: docker
     directory: '/'
-    rebase-strategy: disabled
     schedule:
-      interval: weekly
+      interval: monthly
+    cooldown:
+      default-days: 7
 
   # Ruby dependencies
   - package-ecosystem: bundler
     directory: '/'
-    rebase-strategy: disabled
     schedule:
-      interval: weekly
+      interval: monthly
+    cooldown:
+      default-days: 7
